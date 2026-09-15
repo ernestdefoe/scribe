@@ -119,3 +119,7 @@ with). Your existing posts will render exactly as before.
 ## Licence
 
 MIT.
+
+## Changelog
+
+Every release, with what changed and why: **[CHANGELOG.md](CHANGELOG.md)**.
