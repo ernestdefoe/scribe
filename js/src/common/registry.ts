@@ -70,3 +70,30 @@ export function registeredExtensions(): readonly ScribeExtensionFactory[] {
 export function registeredButtons(): readonly ScribeButton[] {
   return extraButtons;
 }
+
+/**
+ * 🚨 Announce the registry under a stable id, explicitly.
+ *
+ * Flarum's build registers a module under its own source path, but only for
+ * modules webpack keeps separate — this one gets concatenated into
+ * `common/toolbarButtons`, so it never appears in `flarum.reg` under any name.
+ * An extension calling `flarum.reg.onLoad('ernestdefoe-scribe', 'common/registry', …)`
+ * would wait for something that is never added, and the failure is silent on
+ * both sides: Scribe reports nothing, and the extension's node and button
+ * simply never exist.
+ *
+ * Registering by hand also pins the id. `common/registry` is a file path and
+ * would change if this file ever moved; `registry` is a promise to other
+ * extensions.
+ *
+ * At module scope, not in an initializer, so it is available before anyone's
+ * initializer runs whichever bundle the browser evaluates first.
+ */
+declare const flarum: { reg?: { add(namespace: string, id: string, object: any): void } };
+
+flarum?.reg?.add('ernestdefoe-scribe', 'registry', {
+  registerExtension,
+  registerButton,
+  registeredExtensions,
+  registeredButtons,
+});
