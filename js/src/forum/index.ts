@@ -6,7 +6,15 @@ import ScribeEditorDriver from '../common/ScribeEditorDriver';
 import { applyReplyGates } from './replyGate';
 
 export { default as ScribeEditorDriver } from '../common/ScribeEditorDriver';
-export { SCRIBE_BUTTONS, DEFAULT_TOOLBAR } from '../common/toolbarButtons';
+export { SCRIBE_BUTTONS, DEFAULT_TOOLBAR, allButtons } from '../common/toolbarButtons';
+export type { ScribeButton } from '../common/toolbarButtons';
+/*
+ * The seam other extensions build against. Exported from BOTH bundles: a node
+ * only matters in the composer, but a button has to be registered in admin too
+ * or it never appears in the toolbar builder for anyone to place.
+ */
+export { registerExtension, registerButton } from '../common/registry';
+export type { ScribeTiptapKit, ScribeExtensionFactory } from '../common/registry';
 
 app.initializers.add('ernestdefoe/scribe', () => {
   /*

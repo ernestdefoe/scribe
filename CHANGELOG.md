@@ -6,6 +6,33 @@ stack.
 Every entry links to its full release notes, which carry the reasoning and, for
 the bugs, what actually went wrong.
 
+## [Unreleased]
+
+**Other extensions can now add to the editor.** Scribe's node list and its
+toolbar were both closed — a fixed array and a fixed const — so nothing outside
+this repository could teach the editor a new kind of content. That is now a
+registry.
+
+### Added
+
+- **`registerExtension()` and `registerButton()`.** An extension hands over a
+  factory and gets `Node`, `Mark`, `Extension` and `mergeAttributes` back, so it
+  can build a TipTap node **without depending on TipTap**. That matters more than
+  it sounds: importing `@tiptap/core` to build one node would pull 430KB into a
+  bundle Flarum loads on every page, quietly undoing the split Scribe exists to
+  maintain. The factory runs once, when a composer is first opened.
+- **A registered button carries its own `translationKey`**, resolved verbatim
+  instead of under Scribe's namespace — where another extension has no entries,
+  and its tooltip would otherwise render as the raw key.
+- **Registered buttons appear in the AdminCP toolbar builder**, and are added to
+  the toolbar for admins who have never arranged theirs by hand. An arrangement
+  made on purpose is left alone: an extension installed later does not push a
+  button into it.
+
+See **[Extending Scribe](README.md#extending-scribe)** for the shape of it,
+including the half that is easy to miss — the element has to be registered
+server-side too, or the post saves and the content is silently gone.
+
 ## [1.1.2] — 2026-09-15
 
 **Pasting an image gives you one image.** Reported by **@tennyy** — two bugs

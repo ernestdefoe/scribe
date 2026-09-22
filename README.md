@@ -101,6 +101,51 @@ rather than on every keystroke.
 - **FoF Upload** — inserts `![alt](url)`; Scribe turns it into a real image node.
 - **flarum/bbcode** — keep it or don't; Scribe defers to it where they overlap.
 
+## Extending Scribe
+
+Other extensions can teach the editor new content. Register from an initializer
+in **both** bundles — a node only matters in the composer, but a button has to be
+known in admin too or it never appears in the toolbar builder for anyone to place.
+
+```js
+import { registerExtension, registerButton } from 'ernestdefoe/scribe/forum';
+
+registerExtension(({ Node, mergeAttributes }) =>
+  Node.create({
+    name: 'myThing',
+    group: 'block',
+    atom: true,
+    parseHTML: () => [{ tag: 'my-thing' }],
+    renderHTML: ({ HTMLAttributes }) => ['my-thing', mergeAttributes(HTMLAttributes)],
+  })
+);
+
+registerButton({
+  key: 'myThing',
+  icon: 'fas fa-star',
+  label: 'my_thing',
+  translationKey: 'acme-mything.forum.buttons.insert',
+  run: (editor) => editor.chain().focus().insertContent('<my-thing></my-thing>').run(),
+});
+```
+
+Your factory is handed `Node`, `Mark`, `Extension` and `mergeAttributes`, so
+**your extension never depends on TipTap**. That keeps the 430KB out of your
+bundle, which Flarum loads on every page.
+
+Two things to know:
+
+- **Register the element server-side as well.** Scribe parses post HTML through a
+  closed element list, and anything outside it is dropped at parse time,
+  silently — the post saves and the content is simply gone. Load s9e's
+  `HTMLElements` plugin from your own `Extend\Formatter` callback and alias your
+  element onto your own tag. The client node and the server alias are one change
+  written in two files.
+- **Don't rely on the button being placed.** It is added to the toolbar for
+  admins who have never arranged theirs by hand; for everyone else it waits in
+  the builder's palette. Whatever your extension does should have a path that
+  works without it.
+
 ## Installation
 
 ```bash

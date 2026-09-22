@@ -26,6 +26,7 @@ import Subscript from '@tiptap/extension-subscript';
 import { TextStyle } from '@tiptap/extension-text-style';
 import { Table, TableRow, TableCell, TableHeader } from '@tiptap/extension-table';
 import { Extension, Mark, Node, mergeAttributes } from '@tiptap/core';
+import { registeredExtensions } from '../registry';
 
 /**
  * A colour is stored in `data-color` and filtered server-side by s9e's #color.
@@ -342,5 +343,18 @@ export function buildExtensions(placeholder: string) {
     TableHeader,
     TableCell,
     Placeholder.configure({ placeholder }),
+    /*
+     * Nodes, marks and behaviours registered by other extensions, built here
+     * rather than at registration time so they get TipTap without depending on
+     * it — see common/registry.ts for why that matters.
+     *
+     * 🚨 Last in the array on purpose. TipTap resolves conflicting keyboard
+     * shortcuts and input rules in favour of the LAST extension that claims
+     * them, so a third party can deliberately override a built-in. It also
+     * means a careless one can take Enter away from paragraphs, which is worth
+     * knowing when a forum reports the editor "stopped working" after
+     * installing something.
+     */
+    ...registeredExtensions().map((factory) => factory({ Node, Mark, Extension, mergeAttributes })),
   ];
 }

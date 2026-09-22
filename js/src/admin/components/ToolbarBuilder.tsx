@@ -1,7 +1,7 @@
 import app from 'flarum/admin/app';
 import Component from 'flarum/common/Component';
 import Button from 'flarum/common/components/Button';
-import { SCRIBE_BUTTONS, DEFAULT_TOOLBAR, type ScribeButton } from '../../common/toolbarButtons';
+import { allButtons, DEFAULT_TOOLBAR, type ScribeButton } from '../../common/toolbarButtons';
 
 declare const m: any;
 
@@ -47,7 +47,7 @@ export default class ToolbarBuilder extends Component<ToolbarBuilderAttrs> {
       if (Array.isArray(parsed) && parsed.length) {
         // Drop keys this version no longer knows about, so a setting saved by a
         // newer build cannot render an empty control here.
-        const known = new Set(SCRIBE_BUTTONS.map((b) => b.key));
+        const known = new Set(allButtons().map((b) => b.key));
         return parsed.filter((k: string) => known.has(k));
       }
     } catch (e) {
@@ -58,11 +58,11 @@ export default class ToolbarBuilder extends Component<ToolbarBuilderAttrs> {
   }
 
   byKey(key: string): ScribeButton | undefined {
-    return SCRIBE_BUTTONS.find((b) => b.key === key);
+    return allButtons().find((b) => b.key === key);
   }
 
   get palette(): ScribeButton[] {
-    return SCRIBE_BUTTONS.filter((b) => !this.keys.includes(b.key));
+    return allButtons().filter((b) => !this.keys.includes(b.key));
   }
 
   view() {

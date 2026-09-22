@@ -1,4 +1,5 @@
 import type { Editor } from '@tiptap/core';
+import { registeredButtons } from './registry';
 
 /** scribeAlign is a global attribute, not a mark/node — check every host type. */
 function isAlign(e: Editor, align: string): boolean {
@@ -14,6 +15,13 @@ export interface ScribeButton {
   icon: string;
   /** Translation key suffix under ernestdefoe-scribe.forum.composer */
   label: string;
+  /**
+   * A FULL translation key, used verbatim instead of `label`.
+   *
+   * For buttons registered by other extensions, which have no entries under
+   * Scribe's namespace — without this their tooltip renders as the raw key.
+   */
+  translationKey?: string;
   /** Whether the mark/node is active at the cursor, for the pressed state. */
   active?: (e: Editor) => boolean;
   /** Whether the command can run right now, for the disabled state. */
@@ -144,8 +152,22 @@ export const TABLE_ACTIONS: ScribeButton[] = [
     enabled: (e) => e.can().deleteColumn(), run: (e) => e.chain().focus().deleteColumn().run() },
 ];
 
+/**
+ * Scribe's own buttons plus any another extension has registered.
+ *
+ * 🚨 Every consumer of the button list must go through this, not
+ * SCRIBE_BUTTONS. A registered button missing from the admin builder can't be
+ * added to the toolbar; missing from `buttonsFor` it is dropped as an unknown
+ * key even after it has been; and missing from the driver's active-state
+ * signature its pressed state never refreshes. Three different ways for a
+ * button to be registered and still not work.
+ */
+export function allButtons(): ScribeButton[] {
+  return [...SCRIBE_BUTTONS, ...registeredButtons()];
+}
+
 export function buttonsFor(keys: string[]): ScribeButton[] {
-  const byKey = new Map(SCRIBE_BUTTONS.map((b) => [b.key, b]));
+  const byKey = new Map(allButtons().map((b) => [b.key, b]));
   // Unknown keys are dropped rather than rendered blank — a setting saved by an
   // older version must not leave a dead control in the toolbar.
   return keys.map((k) => byKey.get(k)).filter((b): b is ScribeButton => !!b);
