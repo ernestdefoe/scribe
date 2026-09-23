@@ -6,7 +6,7 @@ stack.
 Every entry links to its full release notes, which carry the reasoning and, for
 the bugs, what actually went wrong.
 
-## [Unreleased]
+## [1.2.0] — 2026-09-23
 
 **Other extensions can now add to the editor.** Scribe's node list and its
 toolbar were both closed — a fixed array and a fixed const — so nothing outside
