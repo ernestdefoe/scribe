@@ -78,7 +78,9 @@ export default class ToolbarBuilder extends Component<ToolbarBuilderAttrs> {
             this.dropIndex = this.indexFromPointer(e);
           }}
           ondrop={(e: DragEvent) => this.onDrop(e)}
-          ondragleave={() => { this.dropIndex = null; }}
+          ondragleave={() => {
+            this.dropIndex = null;
+          }}
         >
           {this.keys.length === 0 && <div className="ScribeBuilder-empty">{t('toolbar_empty')}</div>}
           {this.keys.map((key, i) => this.chip(this.byKey(key)!, i, 'toolbar'))}
@@ -103,16 +105,13 @@ export default class ToolbarBuilder extends Component<ToolbarBuilderAttrs> {
 
         <div className="ScribeBuilder-actions">
           {/*
-            * 🚨 No Save button here. The extension page already ends with one,
-            * and a second button that also says "Save Changes" makes the reader
-            * work out which of the two is the real one. Changes go into the
-            * page's own setting stream, so its Save persists them along with
-            * everything else on the page.
-            */}
-          {Button.component(
-            { className: 'Button Button--link', onclick: () => this.commit([...DEFAULT_TOOLBAR]) },
-            t('reset')
-          )}
+           * 🚨 No Save button here. The extension page already ends with one,
+           * and a second button that also says "Save Changes" makes the reader
+           * work out which of the two is the real one. Changes go into the
+           * page's own setting stream, so its Save persists them along with
+           * everything else on the page.
+           */}
+          {Button.component({ className: 'Button Button--link', onclick: () => this.commit([...DEFAULT_TOOLBAR]) }, t('reset'))}
         </div>
       </div>
     );
@@ -125,11 +124,7 @@ export default class ToolbarBuilder extends Component<ToolbarBuilderAttrs> {
 
     return (
       <div
-        className={
-          'ScribeBuilder-chip' +
-          (this.dragKey === b.key ? ' is-dragging' : '') +
-          (isDropBefore ? ' is-dropBefore' : '')
-        }
+        className={'ScribeBuilder-chip' + (this.dragKey === b.key ? ' is-dragging' : '') + (isDropBefore ? ' is-dropBefore' : '')}
         draggable={true}
         tabindex="0"
         data-index={index}
@@ -164,9 +159,7 @@ export default class ToolbarBuilder extends Component<ToolbarBuilderAttrs> {
    * the pointer's Y, then do the X comparison only within that row.
    */
   indexFromPointer(e: DragEvent): number {
-    const chips = Array.from(
-      (e.currentTarget as HTMLElement).querySelectorAll<HTMLElement>('.ScribeBuilder-chip')
-    );
+    const chips = Array.from((e.currentTarget as HTMLElement).querySelectorAll<HTMLElement>('.ScribeBuilder-chip'));
     if (!chips.length) return 0;
 
     const rects = chips.map((el) => el.getBoundingClientRect());
@@ -179,9 +172,7 @@ export default class ToolbarBuilder extends Component<ToolbarBuilderAttrs> {
 
     const targetRow = rows.reduce((best, row) => {
       const center = (rects: DOMRect[], row: number[]) => rects[row[0]].top + rects[row[0]].height / 2;
-      return Math.abs(e.clientY - center(rects, row)) < Math.abs(e.clientY - center(rects, best))
-        ? row
-        : best;
+      return Math.abs(e.clientY - center(rects, row)) < Math.abs(e.clientY - center(rects, best)) ? row : best;
     }, rows[0]);
 
     for (const i of targetRow) {
@@ -226,5 +217,4 @@ export default class ToolbarBuilder extends Component<ToolbarBuilderAttrs> {
     this.dragFrom = null;
     this.dropIndex = null;
   }
-
 }

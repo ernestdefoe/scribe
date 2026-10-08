@@ -1,1 +1,7 @@
 /.test-build/
+/vendor
+/js/node_modules
+/composer.lock
+.phpunit.result.cache
+/tests/integration/tmp
+/js/coverage-ts

@@ -24,4 +24,3 @@ export function insertVideo(editor: Editor, ref: VideoRef & { caption?: string }
   const chain = editor.chain().focus();
   return range ? chain.insertContentAt(range, content).run() : chain.insertContent(content).run();
 }
-

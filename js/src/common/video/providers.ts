@@ -49,7 +49,7 @@ export const thumbnailUrl = (ref: VideoRef) => thumbnail(VIDEO_PROVIDERS, ref);
 /** The name shown on a poster and in "Watch on …": the company, not the format. */
 export function videoBrand(provider: string): string {
   const def = VIDEO_PROVIDERS[provider];
-  return def ? def.brand ?? def.name : provider;
+  return def ? (def.brand ?? def.name) : provider;
 }
 
 /** "16:9" → "16x9", the suffix of the Scribe-video--r* class the stylesheet sizes by. */

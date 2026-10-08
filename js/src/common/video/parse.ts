@@ -67,7 +67,7 @@ export function parseStart(value: string | null | undefined): number | undefined
   else if (/^\d+s$/.test(v)) seconds = parseInt(v, 10);
   else if (/^(?:\d+h)?(?:\d+m)?(?:\d+s)?$/.test(v) && v !== '') {
     const m = /^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/.exec(v)!;
-    seconds = (+(m[1] || 0)) * 3600 + (+(m[2] || 0)) * 60 + (+(m[3] || 0));
+    seconds = +(m[1] || 0) * 3600 + +(m[2] || 0) * 60 + +(m[3] || 0);
   } else if (/^\d{1,2}(?::\d{1,2}){1,2}$/.test(v)) {
     seconds = v.split(':').reduce((total, part) => total * 60 + parseInt(part, 10), 0);
   }
@@ -80,11 +80,7 @@ export function parseStart(value: string | null | undefined): number | undefined
  * registry can embed. `enabled`, when given, filters out providers an admin has
  * switched off.
  */
-export function parseVideoUrl(
-  registry: VideoRegistry,
-  input: string,
-  enabled?: (provider: string) => boolean
-): VideoRef | null {
+export function parseVideoUrl(registry: VideoRegistry, input: string, enabled?: (provider: string) => boolean): VideoRef | null {
   const text = (input || '').trim();
   if (!text || text.length > MAX_URL || /\s/.test(text)) return null;
 
@@ -100,7 +96,10 @@ export function parseVideoUrl(
   // classic way to make a lookalike read as the real host.
   if (url.username || url.password || url.port) return null;
 
-  const host = url.hostname.toLowerCase().replace(/\.$/, '').replace(/^www\./, '');
+  const host = url.hostname
+    .toLowerCase()
+    .replace(/\.$/, '')
+    .replace(/^www\./, '');
 
   for (const key of Object.keys(registry)) {
     if (enabled && !enabled(key)) continue;

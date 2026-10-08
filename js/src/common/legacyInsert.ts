@@ -45,11 +45,7 @@ const LINK = /\[([^\]]+)\]\(([^)\s]+)\)/g;
 const UPL_PREVIEW = /\[upl-image-preview\s+([^\]]*)\]/g;
 
 function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 /** Only http(s) and root-relative targets; never javascript: or data:. */

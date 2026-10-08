@@ -3,14 +3,7 @@ import extractText from 'flarum/common/utils/extractText';
 import { Extension, Node, mergeAttributes, type Editor } from '@tiptap/core';
 import { Plugin, PluginKey, NodeSelection } from '@tiptap/pm/state';
 import type { Node as PMNode } from '@tiptap/pm/model';
-import {
-  VIDEO_PROVIDERS,
-  isValidVideo,
-  thumbnailUrl,
-  videoBrand,
-  videoFromUrl,
-  videoRatioClass,
-} from '../video/providers';
+import { VIDEO_PROVIDERS, isValidVideo, thumbnailUrl, videoBrand, videoFromUrl, videoRatioClass } from '../video/providers';
 import { insertVideo } from '../video/insert';
 
 /**
@@ -66,8 +59,7 @@ export const ScribeVideo = Node.create({
   },
 
   parseHTML() {
-    const valid = (el: HTMLElement) =>
-      isValidVideo(el.getAttribute('data-provider') || '', el.getAttribute('data-id')) ? null : false;
+    const valid = (el: HTMLElement) => (isValidVideo(el.getAttribute('data-provider') || '', el.getAttribute('data-id')) ? null : false);
 
     return [
       { tag: 'video[data-provider]', getAttrs: valid },
@@ -75,8 +67,7 @@ export const ScribeVideo = Node.create({
         // The rendered facade: the caption is the one part of it that is content.
         tag: 'figure.Scribe-video[data-provider]',
         getAttrs: valid,
-        contentElement: (el: HTMLElement) =>
-          (el.querySelector('.Scribe-videoCaption') as HTMLElement) ?? document.createElement('span'),
+        contentElement: (el: HTMLElement) => (el.querySelector('.Scribe-videoCaption') as HTMLElement) ?? document.createElement('span'),
       },
     ];
   },
@@ -94,8 +85,16 @@ export const ScribeVideo = Node.create({
         if ($from.parent.type.name !== this.name) return false;
         const after = $from.after();
         const next = editor.state.doc.resolve(after).nodeAfter;
-        if (next && next.type.name === 'paragraph') return editor.chain().focus(after + 1).run();
-        return editor.chain().insertContentAt(after, { type: 'paragraph' }).focus(after + 1).run();
+        if (next && next.type.name === 'paragraph')
+          return editor
+            .chain()
+            .focus(after + 1)
+            .run();
+        return editor
+          .chain()
+          .insertContentAt(after, { type: 'paragraph' })
+          .focus(after + 1)
+          .run();
       },
     };
   },
@@ -182,7 +181,11 @@ class VideoNodeView {
   private watch: HTMLElement;
   private rendered = '';
 
-  constructor(private node: PMNode, private editor: Editor, private getPos: () => number | undefined) {
+  constructor(
+    private node: PMNode,
+    private editor: Editor,
+    private getPos: () => number | undefined
+  ) {
     this.dom = el('div', 'Scribe-videoNode');
 
     this.figure = el('figure', 'Scribe-video');
@@ -282,7 +285,11 @@ class VideoNodeView {
   private remove() {
     const pos = this.getPos();
     if (typeof pos !== 'number') return;
-    this.editor.chain().focus().deleteRange({ from: pos, to: pos + this.node.nodeSize }).run();
+    this.editor
+      .chain()
+      .focus()
+      .deleteRange({ from: pos, to: pos + this.node.nodeSize })
+      .run();
   }
 
   update(node: PMNode) {

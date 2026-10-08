@@ -51,8 +51,7 @@ export const ScribeColor = Mark.create({
          * `style` attribute it doesn't alias, same as Highlight's own
          * multicolor output already does.
          */
-        renderHTML: (attrs: Record<string, any>) =>
-          attrs.color ? { 'data-color': attrs.color, style: `color: ${attrs.color}` } : {},
+        renderHTML: (attrs: Record<string, any>) => (attrs.color ? { 'data-color': attrs.color, style: `color: ${attrs.color}` } : {}),
       },
     };
   },
@@ -97,8 +96,7 @@ export const ScribeSpoiler = Node.create({
       label: {
         default: '',
         parseHTML: (el: HTMLElement) => el.getAttribute('data-title') ?? '',
-        renderHTML: (attrs: Record<string, any>) =>
-          attrs.label ? { 'data-title': attrs.label } : {},
+        renderHTML: (attrs: Record<string, any>) => (attrs.label ? { 'data-title': attrs.label } : {}),
       },
     };
   },
@@ -106,8 +104,7 @@ export const ScribeSpoiler = Node.create({
     return [
       {
         tag: 'details.Scribe-spoiler',
-        contentElement: (el: HTMLElement) =>
-          (el.querySelector(':scope > .Scribe-spoilerBody') as HTMLElement) ?? el,
+        contentElement: (el: HTMLElement) => (el.querySelector(':scope > .Scribe-spoilerBody') as HTMLElement) ?? el,
       },
     ];
   },
@@ -139,8 +136,7 @@ export const ScribeInfo = Node.create({
       label: {
         default: '',
         parseHTML: (el: HTMLElement) => el.getAttribute('data-title') ?? '',
-        renderHTML: (attrs: Record<string, any>) =>
-          attrs.label ? { 'data-title': attrs.label } : {},
+        renderHTML: (attrs: Record<string, any>) => (attrs.label ? { 'data-title': attrs.label } : {}),
       },
       font: colorAttr('font', 'data-font'),
       bg: colorAttr('bg', 'data-bg'),
@@ -151,8 +147,7 @@ export const ScribeInfo = Node.create({
     return [
       {
         tag: 'aside.Scribe-info',
-        contentElement: (el: HTMLElement) =>
-          (el.querySelector(':scope > .Scribe-infoBody') as HTMLElement) ?? el,
+        contentElement: (el: HTMLElement) => (el.querySelector(':scope > .Scribe-infoBody') as HTMLElement) ?? el,
       },
     ];
   },
@@ -165,11 +160,7 @@ export const ScribeInfo = Node.create({
       .filter(Boolean)
       .join(';');
 
-    return [
-      'aside',
-      mergeAttributes(HTMLAttributes, { class: 'Scribe-info', ...(style ? { style } : {}) }),
-      0,
-    ];
+    return ['aside', mergeAttributes(HTMLAttributes, { class: 'Scribe-info', ...(style ? { style } : {}) }), 0];
   },
 });
 
@@ -214,8 +205,7 @@ export const ScribeImageAlign = Node.create({
       align: {
         default: null,
         parseHTML: (el: HTMLElement) => el.getAttribute('data-align'),
-        renderHTML: (attrs: Record<string, any>) =>
-          attrs.align ? { 'data-align': attrs.align } : {},
+        renderHTML: (attrs: Record<string, any>) => (attrs.align ? { 'data-align': attrs.align } : {}),
       },
     };
   },
@@ -247,8 +237,7 @@ export const ScribeAlign = Extension.create({
           align: {
             default: null,
             parseHTML: (el: HTMLElement) => el.getAttribute('data-align'),
-            renderHTML: (attrs: Record<string, any>) =>
-              attrs.align ? { 'data-align': attrs.align } : {},
+            renderHTML: (attrs: Record<string, any>) => (attrs.align ? { 'data-align': attrs.align } : {}),
           },
         },
       },
@@ -272,15 +261,10 @@ export const ScribeAlign = Extension.create({
       setAlign:
         (align: string) =>
         ({ commands }: any) => {
-          const onTextBlock = this.options.types
-            .map((type: string) => commands.updateAttributes(type, { align }))
-            .some(Boolean);
+          const onTextBlock = this.options.types.map((type: string) => commands.updateAttributes(type, { align })).some(Boolean);
           if (onTextBlock) return true;
 
-          return (
-            commands.updateAttributes('scribeImageAlign', { align }) ||
-            commands.wrapIn('scribeImageAlign', { align })
-          );
+          return commands.updateAttributes('scribeImageAlign', { align }) || commands.wrapIn('scribeImageAlign', { align });
         },
     } as any;
   },

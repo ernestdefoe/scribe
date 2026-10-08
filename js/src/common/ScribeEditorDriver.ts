@@ -205,10 +205,7 @@ export default class ScribeEditorDriver implements EditorDriverInterface {
    */
   private renderToolbar(): void {
     if (this.destroyed) return;
-    m.render(
-      this.toolbarEl,
-      m(ScribeToolbar, { editor: this.editor, onChange: () => this.renderToolbar() })
-    );
+    m.render(this.toolbarEl, m(ScribeToolbar, { editor: this.editor, onChange: () => this.renderToolbar() }));
   }
 
   /**

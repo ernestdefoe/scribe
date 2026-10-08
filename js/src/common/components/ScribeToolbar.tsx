@@ -5,13 +5,7 @@ import Button from 'flarum/common/components/Button';
 import Tooltip from 'flarum/common/components/Tooltip';
 import extractText from 'flarum/common/utils/extractText';
 import type { Editor } from '@tiptap/core';
-import {
-  buttonsFor,
-  DEFAULT_TOOLBAR,
-  ALIGN_ACTIONS,
-  TABLE_ACTIONS,
-  type ScribeButton,
-} from '../toolbarButtons';
+import { buttonsFor, DEFAULT_TOOLBAR, ALIGN_ACTIONS, TABLE_ACTIONS, type ScribeButton } from '../toolbarButtons';
 import { registeredButtons } from '../registry';
 import { insertVideo } from '../video/insert';
 import { anyVideoFromUrl, videoBrand, videoEmbedsEnabled, videoFromUrl, watchUrl } from '../video/providers';
@@ -85,18 +79,7 @@ function toPickerHex(value: string): string {
 const INFO_DEFAULTS = { font: '#1E2019', bg: '#B8D3D1', border: '#B8D3D1' };
 
 export default class ScribeToolbar extends Component<ScribeToolbarAttrs> {
-  prompt:
-    | 'link'
-    | 'image'
-    | 'video'
-    | 'color'
-    | 'highlight'
-    | 'spoiler'
-    | 'info'
-    | 'table'
-    | 'alignMenu'
-    | 'tableMenu'
-    | null = null;
+  prompt: 'link' | 'image' | 'video' | 'color' | 'highlight' | 'spoiler' | 'info' | 'table' | 'alignMenu' | 'tableMenu' | null = null;
   value = '';
   infoFont = INFO_DEFAULTS.font;
   infoBg = INFO_DEFAULTS.bg;
@@ -156,11 +139,7 @@ export default class ScribeToolbar extends Component<ScribeToolbarAttrs> {
 
     return (
       <div className="Scribe-toolbarWrap">
-        <div
-          className="Scribe-toolbar"
-          role="toolbar"
-          aria-label={app.translator.trans('ernestdefoe-scribe.forum.composer.toolbar_label')}
-        >
+        <div className="Scribe-toolbar" role="toolbar" aria-label={app.translator.trans('ernestdefoe-scribe.forum.composer.toolbar_label')}>
           {buttonsFor(configured)
             // Embeds switched off in the AdminCP: no button that would make one.
             .filter((b) => b.key !== 'video' || videoEmbedsEnabled())
@@ -178,8 +157,7 @@ export default class ScribeToolbar extends Component<ScribeToolbarAttrs> {
     return (
       <Tooltip text={tooltipText(b)}>
         {Button.component({
-          className:
-            'Button Button--icon Button--link Scribe-toolbarButton' + (active ? ' is-active' : ''),
+          className: 'Button Button--icon Button--link Scribe-toolbarButton' + (active ? ' is-active' : ''),
           icon: b.icon,
           // The pressed state is what tells a screen-reader user the cursor is
           // inside bold text, which sighted users read off the highlight.
@@ -241,9 +219,8 @@ export default class ScribeToolbar extends Component<ScribeToolbarAttrs> {
     if (kind === 'link') this.value = editor.getAttributes('link').href ?? '';
     else if (kind === 'video') {
       const attrs = editor.getAttributes('scribeVideo');
-      this.value = attrs.provider ? watchUrl(attrs as any) ?? '' : '';
-    }
-    else if (kind === 'spoiler') this.value = editor.getAttributes('scribeSpoiler').label ?? '';
+      this.value = attrs.provider ? (watchUrl(attrs as any) ?? '') : '';
+    } else if (kind === 'spoiler') this.value = editor.getAttributes('scribeSpoiler').label ?? '';
     else if (kind === 'info') {
       const attrs = editor.getAttributes('scribeInfo');
       this.value = attrs.label ?? '';
@@ -283,14 +260,7 @@ export default class ScribeToolbar extends Component<ScribeToolbarAttrs> {
       return (
         <div className="Scribe-prompt Scribe-prompt--color">
           {SWATCHES.map((c) => (
-            <button
-              type="button"
-              className="Scribe-swatch"
-              style={{ background: c }}
-              aria-label={c}
-              title={c}
-              onclick={() => applyColor(c)}
-            />
+            <button type="button" className="Scribe-swatch" style={{ background: c }} aria-label={c} title={c} onclick={() => applyColor(c)} />
           ))}
           <input
             type="color"
@@ -346,11 +316,7 @@ export default class ScribeToolbar extends Component<ScribeToolbarAttrs> {
     }
 
     if (kind === 'alignMenu') {
-      return (
-        <div className="Scribe-prompt Scribe-prompt--menu">
-          {ALIGN_ACTIONS.map((b) => this.menuItem(b, editor))}
-        </div>
-      );
+      return <div className="Scribe-prompt Scribe-prompt--menu">{ALIGN_ACTIONS.map((b) => this.menuItem(b, editor))}</div>;
     }
 
     if (kind === 'tableMenu') {
@@ -413,9 +379,7 @@ export default class ScribeToolbar extends Component<ScribeToolbarAttrs> {
           <input
             className="FormControl Scribe-promptInput"
             type="text"
-            placeholder={app.translator.trans(
-              'ernestdefoe-scribe.forum.composer.spoiler_title_placeholder'
-            ) as string}
+            placeholder={app.translator.trans('ernestdefoe-scribe.forum.composer.spoiler_title_placeholder') as string}
             value={this.value}
             oninput={(e: any) => {
               this.value = e.target.value;
@@ -455,13 +419,7 @@ export default class ScribeToolbar extends Component<ScribeToolbarAttrs> {
         close();
       };
 
-      const field = (
-        value: string,
-        set: (v: string) => void,
-        placeholder: string,
-        label: string,
-        withPicker = false
-      ) => (
+      const field = (value: string, set: (v: string) => void, placeholder: string, label: string, withPicker = false) => (
         <span className="Scribe-colorField">
           {withPicker && (
             <input
@@ -496,9 +454,12 @@ export default class ScribeToolbar extends Component<ScribeToolbarAttrs> {
             value={this.infoEmoji}
             oninput={(e: any) => (this.infoEmoji = e.target.value)}
           />
-          {field(this.value, (v) => (this.value = v),
+          {field(
+            this.value,
+            (v) => (this.value = v),
             app.translator.trans('ernestdefoe-scribe.forum.composer.info_title_placeholder') as string,
-            app.translator.trans('ernestdefoe-scribe.forum.composer.info_title_placeholder') as string)}
+            app.translator.trans('ernestdefoe-scribe.forum.composer.info_title_placeholder') as string
+          )}
           {field(this.infoFont, (v) => (this.infoFont = v), INFO_DEFAULTS.font, 'font colour', true)}
           {field(this.infoBg, (v) => (this.infoBg = v), INFO_DEFAULTS.bg, 'background colour', true)}
           {field(this.infoBorder, (v) => (this.infoBorder = v), INFO_DEFAULTS.border, 'border colour', true)}
@@ -512,9 +473,7 @@ export default class ScribeToolbar extends Component<ScribeToolbarAttrs> {
 
     if (kind === 'video') return this.videoPrompt(editor, close);
 
-    const placeholder = app.translator.trans(
-      `ernestdefoe-scribe.forum.composer.${kind === 'link' ? 'link_placeholder' : 'image_placeholder'}`
-    );
+    const placeholder = app.translator.trans(`ernestdefoe-scribe.forum.composer.${kind === 'link' ? 'link_placeholder' : 'image_placeholder'}`);
 
     const apply = () => {
       const url = this.value.trim();

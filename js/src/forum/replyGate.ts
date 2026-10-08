@@ -90,7 +90,10 @@ export function applyReplyGates(element: HTMLElement, post: any): void {
   // replied when it was rendered. Now they have: fetch it again, once.
   if (unlocked === true && post.id() && !refetched.has(post.id()) && element.querySelector('.Scribe-replyGate[data-withheld]')) {
     refetched.add(post.id());
-    app.store.find('posts', post.id()).then(() => m.redraw()).catch(() => refetched.delete(post.id()));
+    app.store
+      .find('posts', post.id())
+      .then(() => m.redraw())
+      .catch(() => refetched.delete(post.id()));
   }
 
   gates.forEach((gate) => {
