@@ -15,7 +15,7 @@ class BareDiscordLinksTest extends TestCase
 {
     private function run_(string $html, bool $enabled = true): string
     {
-        $extensions = $this->createMock(ExtensionManager::class);
+        $extensions = $this->createStub(ExtensionManager::class);
         $extensions->method('isEnabled')->willReturn($enabled);
         $parser = (new \ReflectionClass(Parser::class))->newInstanceWithoutConstructor();
 
