@@ -6,14 +6,14 @@
  * Deliberately does NOT depend on flarum/markdown. See src/Formatter/Vocabulary.
  */
 
-use Flarum\Api\Resource\DiscussionResource;
-use Flarum\Extend;
-use Flarum\Extension\ExtensionManager;
 use ErnestDefoe\Scribe\Api\SynopsisExcerpt;
 use ErnestDefoe\Scribe\Formatter\BareDiscordLinks;
 use ErnestDefoe\Scribe\Formatter\Configure;
 use ErnestDefoe\Scribe\Formatter\ReplyGate;
 use ErnestDefoe\Scribe\Formatter\VideoEmbed;
+use Flarum\Api\Resource\DiscussionResource;
+use Flarum\Extend;
+use Flarum\Extension\ExtensionManager;
 
 return [
     /*

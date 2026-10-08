@@ -27,30 +27,30 @@ abstract class Vocabulary
      * arbitrary markup into a post.
      */
     public const ELEMENTS = [
-        'strong'     => 'STRONG',
-        'b'          => 'STRONG',
-        'em'         => 'EM',
-        'i'          => 'EM',
-        'del'        => 'DEL',
-        's'          => 'DEL',
-        'strike'     => 'DEL',
-        'code'       => 'C',
-        'sup'        => 'SUP',
-        'sub'        => 'SUB',
-        'h1'         => 'H1',
-        'h2'         => 'H2',
-        'h3'         => 'H3',
-        'h4'         => 'H4',
-        'h5'         => 'H5',
-        'h6'         => 'H6',
-        'hr'         => 'HR',
-        'ul'         => 'LIST',
-        'ol'         => 'LIST',
-        'li'         => 'LI',
+        'strong' => 'STRONG',
+        'b' => 'STRONG',
+        'em' => 'EM',
+        'i' => 'EM',
+        'del' => 'DEL',
+        's' => 'DEL',
+        'strike' => 'DEL',
+        'code' => 'C',
+        'sup' => 'SUP',
+        'sub' => 'SUB',
+        'h1' => 'H1',
+        'h2' => 'H2',
+        'h3' => 'H3',
+        'h4' => 'H4',
+        'h5' => 'H5',
+        'h6' => 'H6',
+        'hr' => 'HR',
+        'ul' => 'LIST',
+        'ol' => 'LIST',
+        'li' => 'LI',
         'blockquote' => 'QUOTE',
-        'pre'        => 'CODE',
-        'a'          => 'URL',
-        'img'        => 'IMG',
+        'pre' => 'CODE',
+        'a' => 'URL',
+        'img' => 'IMG',
     ];
 
     /**
@@ -73,26 +73,26 @@ abstract class Vocabulary
      * on QUOTE). See Configure::class.
      */
     public const TEMPLATES = [
-        'C'      => '<code><xsl:apply-templates/></code>',
-        'CODE'   => '<pre><code><xsl:if test="@lang"><xsl:attribute name="class"><xsl:text>language-</xsl:text><xsl:value-of select="@lang"/></xsl:attribute></xsl:if><xsl:apply-templates/></code></pre>',
-        'DEL'    => '<del><xsl:apply-templates/></del>',
-        'EM'     => '<em><xsl:apply-templates/></em>',
-        'EMAIL'  => '<a href="mailto:{@email}"><xsl:apply-templates/></a>',
-        'H1'     => '<h1><xsl:if test="@align"><xsl:attribute name="style"><xsl:text>text-align:</xsl:text><xsl:value-of select="@align"/></xsl:attribute></xsl:if><xsl:apply-templates/></h1>',
-        'H2'     => '<h2><xsl:if test="@align"><xsl:attribute name="style"><xsl:text>text-align:</xsl:text><xsl:value-of select="@align"/></xsl:attribute></xsl:if><xsl:apply-templates/></h2>',
-        'H3'     => '<h3><xsl:if test="@align"><xsl:attribute name="style"><xsl:text>text-align:</xsl:text><xsl:value-of select="@align"/></xsl:attribute></xsl:if><xsl:apply-templates/></h3>',
-        'H4'     => '<h4><xsl:if test="@align"><xsl:attribute name="style"><xsl:text>text-align:</xsl:text><xsl:value-of select="@align"/></xsl:attribute></xsl:if><xsl:apply-templates/></h4>',
-        'H5'     => '<h5><xsl:if test="@align"><xsl:attribute name="style"><xsl:text>text-align:</xsl:text><xsl:value-of select="@align"/></xsl:attribute></xsl:if><xsl:apply-templates/></h5>',
-        'H6'     => '<h6><xsl:if test="@align"><xsl:attribute name="style"><xsl:text>text-align:</xsl:text><xsl:value-of select="@align"/></xsl:attribute></xsl:if><xsl:apply-templates/></h6>',
-        'HR'     => '<hr/>',
-        'IMG'    => '<img src="{@src}"><xsl:copy-of select="@alt"/><xsl:copy-of select="@title"/></img>',
-        'LI'     => '<li><xsl:apply-templates/></li>',
-        'LIST'   => '<xsl:choose><xsl:when test="not(@type)"><ul><xsl:apply-templates/></ul></xsl:when><xsl:otherwise><ol><xsl:copy-of select="@start"/><xsl:apply-templates/></ol></xsl:otherwise></xsl:choose>',
-        'QUOTE'  => '<blockquote><div><xsl:apply-templates/></div></blockquote>',
+        'C' => '<code><xsl:apply-templates/></code>',
+        'CODE' => '<pre><code><xsl:if test="@lang"><xsl:attribute name="class"><xsl:text>language-</xsl:text><xsl:value-of select="@lang"/></xsl:attribute></xsl:if><xsl:apply-templates/></code></pre>',
+        'DEL' => '<del><xsl:apply-templates/></del>',
+        'EM' => '<em><xsl:apply-templates/></em>',
+        'EMAIL' => '<a href="mailto:{@email}"><xsl:apply-templates/></a>',
+        'H1' => '<h1><xsl:if test="@align"><xsl:attribute name="style"><xsl:text>text-align:</xsl:text><xsl:value-of select="@align"/></xsl:attribute></xsl:if><xsl:apply-templates/></h1>',
+        'H2' => '<h2><xsl:if test="@align"><xsl:attribute name="style"><xsl:text>text-align:</xsl:text><xsl:value-of select="@align"/></xsl:attribute></xsl:if><xsl:apply-templates/></h2>',
+        'H3' => '<h3><xsl:if test="@align"><xsl:attribute name="style"><xsl:text>text-align:</xsl:text><xsl:value-of select="@align"/></xsl:attribute></xsl:if><xsl:apply-templates/></h3>',
+        'H4' => '<h4><xsl:if test="@align"><xsl:attribute name="style"><xsl:text>text-align:</xsl:text><xsl:value-of select="@align"/></xsl:attribute></xsl:if><xsl:apply-templates/></h4>',
+        'H5' => '<h5><xsl:if test="@align"><xsl:attribute name="style"><xsl:text>text-align:</xsl:text><xsl:value-of select="@align"/></xsl:attribute></xsl:if><xsl:apply-templates/></h5>',
+        'H6' => '<h6><xsl:if test="@align"><xsl:attribute name="style"><xsl:text>text-align:</xsl:text><xsl:value-of select="@align"/></xsl:attribute></xsl:if><xsl:apply-templates/></h6>',
+        'HR' => '<hr/>',
+        'IMG' => '<img src="{@src}"><xsl:copy-of select="@alt"/><xsl:copy-of select="@title"/></img>',
+        'LI' => '<li><xsl:apply-templates/></li>',
+        'LIST' => '<xsl:choose><xsl:when test="not(@type)"><ul><xsl:apply-templates/></ul></xsl:when><xsl:otherwise><ol><xsl:copy-of select="@start"/><xsl:apply-templates/></ol></xsl:otherwise></xsl:choose>',
+        'QUOTE' => '<blockquote><div><xsl:apply-templates/></div></blockquote>',
         'STRONG' => '<strong><xsl:apply-templates/></strong>',
-        'SUB'    => '<sub><xsl:apply-templates/></sub>',
-        'SUP'    => '<sup><xsl:apply-templates/></sup>',
-        'URL'    => '<a href="{@url}"><xsl:copy-of select="@title"/><xsl:apply-templates/></a>',
+        'SUB' => '<sub><xsl:apply-templates/></sub>',
+        'SUP' => '<sup><xsl:apply-templates/></sup>',
+        'URL' => '<a href="{@url}"><xsl:copy-of select="@title"/><xsl:apply-templates/></a>',
     ];
 
     /**
@@ -106,20 +106,20 @@ abstract class Vocabulary
      * post can contain these tags, so we own them outright.
      */
     public const EXTRA_ELEMENTS = [
-        'p'       => 'P',
-        'u'       => 'U',
-        'mark'    => 'MARK',
-        'table'   => 'TABLE',
-        'thead'   => 'THEAD',
-        'tbody'   => 'TBODY',
-        'tr'      => 'TR',
-        'th'      => 'TH',
-        'td'      => 'TD',
-        'span'    => 'SPAN',
+        'p' => 'P',
+        'u' => 'U',
+        'mark' => 'MARK',
+        'table' => 'TABLE',
+        'thead' => 'THEAD',
+        'tbody' => 'TBODY',
+        'tr' => 'TR',
+        'th' => 'TH',
+        'td' => 'TD',
+        'span' => 'SPAN',
         'details' => 'SCRIBESPOILER',
-        'aside'   => 'SCRIBEINFO',
+        'aside' => 'SCRIBEINFO',
         'section' => 'SCRIBEREPLY',
-        'figure'  => 'SCRIBEIMGALIGN',
+        'figure' => 'SCRIBEIMGALIGN',
         // `video` => SCRIBEVIDEO is registered by VideoEmbed, from the
         // provider registry, because each provider brings its own id pattern.
     ];
@@ -130,8 +130,8 @@ abstract class Vocabulary
          * <p> — the only addition is the conditional align style, so a
          * paragraph without one renders byte-identical to before.
          */
-        'P'     => '<p><xsl:if test="@align"><xsl:attribute name="style"><xsl:text>text-align:</xsl:text><xsl:value-of select="@align"/></xsl:attribute></xsl:if><xsl:apply-templates/></p>',
-        'U'     => '<u><xsl:apply-templates/></u>',
+        'P' => '<p><xsl:if test="@align"><xsl:attribute name="style"><xsl:text>text-align:</xsl:text><xsl:value-of select="@align"/></xsl:attribute></xsl:if><xsl:apply-templates/></p>',
+        'U' => '<u><xsl:apply-templates/></u>',
         /*
          * 🚨 Same `#color`-filtered `data-color` boundary as SPAN below, just
          * background instead of text — TipTap's own Highlight extension in
@@ -143,11 +143,11 @@ abstract class Vocabulary
          * ScribeColor/Highlight's parseHTML looks for the attribute — a
          * style-only render would silently lose the mark on every re-edit.
          */
-        'MARK'  => '<mark><xsl:if test="@color"><xsl:attribute name="data-color"><xsl:value-of select="@color"/></xsl:attribute><xsl:attribute name="style"><xsl:text>background-color:</xsl:text><xsl:value-of select="@color"/></xsl:attribute></xsl:if><xsl:apply-templates/></mark>',
+        'MARK' => '<mark><xsl:if test="@color"><xsl:attribute name="data-color"><xsl:value-of select="@color"/></xsl:attribute><xsl:attribute name="style"><xsl:text>background-color:</xsl:text><xsl:value-of select="@color"/></xsl:attribute></xsl:if><xsl:apply-templates/></mark>',
         'TABLE' => '<div class="Scribe-tableWrap"><table><xsl:apply-templates/></table></div>',
         'THEAD' => '<thead><xsl:apply-templates/></thead>',
         'TBODY' => '<tbody><xsl:apply-templates/></tbody>',
-        'TR'    => '<tr><xsl:apply-templates/></tr>',
+        'TR' => '<tr><xsl:apply-templates/></tr>',
         /*
          * 🚨 `colwidth` is @tiptap/extension-table's own column-drag output
          * (a comma list, one width per spanned column — see its
@@ -158,15 +158,15 @@ abstract class Vocabulary
          * exactly the width the user set; a resized cell that also spans
          * multiple columns gets an approximation, not a broken width.
          */
-        'TH'    => '<th><xsl:copy-of select="@colspan"/><xsl:copy-of select="@rowspan"/><xsl:if test="@align or (@colwidth and @colwidth!=&apos;0&apos;)"><xsl:attribute name="style"><xsl:if test="@align">text-align:<xsl:value-of select="@align"/>;</xsl:if><xsl:if test="@colwidth and @colwidth!=&apos;0&apos;">width:<xsl:choose><xsl:when test="contains(@colwidth,&apos;,&apos;)"><xsl:value-of select="substring-before(@colwidth,&apos;,&apos;)"/></xsl:when><xsl:otherwise><xsl:value-of select="@colwidth"/></xsl:otherwise></xsl:choose>px;</xsl:if></xsl:attribute></xsl:if><xsl:apply-templates/></th>',
-        'TD'    => '<td><xsl:copy-of select="@colspan"/><xsl:copy-of select="@rowspan"/><xsl:if test="@align or (@colwidth and @colwidth!=&apos;0&apos;)"><xsl:attribute name="style"><xsl:if test="@align">text-align:<xsl:value-of select="@align"/>;</xsl:if><xsl:if test="@colwidth and @colwidth!=&apos;0&apos;">width:<xsl:choose><xsl:when test="contains(@colwidth,&apos;,&apos;)"><xsl:value-of select="substring-before(@colwidth,&apos;,&apos;)"/></xsl:when><xsl:otherwise><xsl:value-of select="@colwidth"/></xsl:otherwise></xsl:choose>px;</xsl:if></xsl:attribute></xsl:if><xsl:apply-templates/></td>',
+        'TH' => '<th><xsl:copy-of select="@colspan"/><xsl:copy-of select="@rowspan"/><xsl:if test="@align or (@colwidth and @colwidth!=&apos;0&apos;)"><xsl:attribute name="style"><xsl:if test="@align">text-align:<xsl:value-of select="@align"/>;</xsl:if><xsl:if test="@colwidth and @colwidth!=&apos;0&apos;">width:<xsl:choose><xsl:when test="contains(@colwidth,&apos;,&apos;)"><xsl:value-of select="substring-before(@colwidth,&apos;,&apos;)"/></xsl:when><xsl:otherwise><xsl:value-of select="@colwidth"/></xsl:otherwise></xsl:choose>px;</xsl:if></xsl:attribute></xsl:if><xsl:apply-templates/></th>',
+        'TD' => '<td><xsl:copy-of select="@colspan"/><xsl:copy-of select="@rowspan"/><xsl:if test="@align or (@colwidth and @colwidth!=&apos;0&apos;)"><xsl:attribute name="style"><xsl:if test="@align">text-align:<xsl:value-of select="@align"/>;</xsl:if><xsl:if test="@colwidth and @colwidth!=&apos;0&apos;">width:<xsl:choose><xsl:when test="contains(@colwidth,&apos;,&apos;)"><xsl:value-of select="substring-before(@colwidth,&apos;,&apos;)"/></xsl:when><xsl:otherwise><xsl:value-of select="@colwidth"/></xsl:otherwise></xsl:choose>px;</xsl:if></xsl:attribute></xsl:if><xsl:apply-templates/></td>',
         /*
          * 🚨 The colour lives in an attribute filtered by s9e's #color, never in
          * a style string we assemble from user input. A span whose style we
          * concatenated by hand is a stored-XSS hole: "red;background:url(...)"
          * is a perfectly ordinary-looking colour until it isn't.
          */
-        'SPAN'  => '<span><xsl:if test="@color"><xsl:attribute name="data-color"><xsl:value-of select="@color"/></xsl:attribute><xsl:attribute name="style"><xsl:text>color:</xsl:text><xsl:value-of select="@color"/></xsl:attribute></xsl:if><xsl:apply-templates/></span>',
+        'SPAN' => '<span><xsl:if test="@color"><xsl:attribute name="data-color"><xsl:value-of select="@color"/></xsl:attribute><xsl:attribute name="style"><xsl:text>color:</xsl:text><xsl:value-of select="@color"/></xsl:attribute></xsl:if><xsl:apply-templates/></span>',
         /*
          * 🚨 The editor emits a bare `<details data-title>` with no <summary> —
          * the title bar and the body wrapper below are render-time-only, added
@@ -184,7 +184,7 @@ abstract class Vocabulary
          * more than one. font/bg/border go through #color exactly like SPAN's
          * colour; there is no free-text style path here either.
          */
-        'SCRIBEINFO'  => '<aside class="Scribe-info"><xsl:if test="@label"><xsl:attribute name="data-title"><xsl:value-of select="@label"/></xsl:attribute></xsl:if><xsl:if test="@font"><xsl:attribute name="data-font"><xsl:value-of select="@font"/></xsl:attribute></xsl:if><xsl:if test="@bg"><xsl:attribute name="data-bg"><xsl:value-of select="@bg"/></xsl:attribute></xsl:if><xsl:if test="@border"><xsl:attribute name="data-border"><xsl:value-of select="@border"/></xsl:attribute></xsl:if><xsl:if test="@bg or @border or @font"><xsl:attribute name="style"><xsl:if test="@bg">background:<xsl:value-of select="@bg"/>;</xsl:if><xsl:if test="@border">border-color:<xsl:value-of select="@border"/>;</xsl:if><xsl:if test="@font">color:<xsl:value-of select="@font"/>;</xsl:if></xsl:attribute></xsl:if><xsl:if test="@label"><div class="Scribe-infoTitle"><xsl:value-of select="@label"/></div></xsl:if><div class="Scribe-infoBody"><xsl:apply-templates/></div></aside>',
+        'SCRIBEINFO' => '<aside class="Scribe-info"><xsl:if test="@label"><xsl:attribute name="data-title"><xsl:value-of select="@label"/></xsl:attribute></xsl:if><xsl:if test="@font"><xsl:attribute name="data-font"><xsl:value-of select="@font"/></xsl:attribute></xsl:if><xsl:if test="@bg"><xsl:attribute name="data-bg"><xsl:value-of select="@bg"/></xsl:attribute></xsl:if><xsl:if test="@border"><xsl:attribute name="data-border"><xsl:value-of select="@border"/></xsl:attribute></xsl:if><xsl:if test="@bg or @border or @font"><xsl:attribute name="style"><xsl:if test="@bg">background:<xsl:value-of select="@bg"/>;</xsl:if><xsl:if test="@border">border-color:<xsl:value-of select="@border"/>;</xsl:if><xsl:if test="@font">color:<xsl:value-of select="@font"/>;</xsl:if></xsl:attribute></xsl:if><xsl:if test="@label"><div class="Scribe-infoTitle"><xsl:value-of select="@label"/></div></xsl:if><div class="Scribe-infoBody"><xsl:apply-templates/></div></aside>',
         /*
          * 🚨 Enforced server-side by ReplyGate (a Formatter render callback):
          * for a viewer who has not replied, the children are removed from the
@@ -226,28 +226,28 @@ abstract class Vocabulary
      * attribute without ever trusting what the client sent.
      */
     public const ATTRIBUTES = [
-        'CODE'  => ['lang' => '#simpletext'],
+        'CODE' => ['lang' => '#simpletext'],
         'EMAIL' => ['email' => '#email'],
-        'IMG'   => ['src' => '#url', 'alt' => '#simpletext', 'title' => '#simpletext'],
-        'LIST'  => ['type' => '#simpletext', 'start' => '#uint'],
-        'URL'   => ['url' => '#url', 'title' => '#simpletext'],
-        'TH'    => ['colspan' => '#uint', 'rowspan' => '#uint', 'align' => '#simpletext', 'colwidth' => '#simpletext'],
-        'TD'    => ['colspan' => '#uint', 'rowspan' => '#uint', 'align' => '#simpletext', 'colwidth' => '#simpletext'],
-        'SPAN'  => ['color' => '#color'],
+        'IMG' => ['src' => '#url', 'alt' => '#simpletext', 'title' => '#simpletext'],
+        'LIST' => ['type' => '#simpletext', 'start' => '#uint'],
+        'URL' => ['url' => '#url', 'title' => '#simpletext'],
+        'TH' => ['colspan' => '#uint', 'rowspan' => '#uint', 'align' => '#simpletext', 'colwidth' => '#simpletext'],
+        'TD' => ['colspan' => '#uint', 'rowspan' => '#uint', 'align' => '#simpletext', 'colwidth' => '#simpletext'],
+        'SPAN' => ['color' => '#color'],
         /*
          * 🚨 Same interpolation shape as TH/TD's `align`: the value lands
          * inside a `style` attribute, so #simpletext (letters/digits/space/
          * ./,/_/-/+ only, no `;`, `:` or `(`) is the security boundary, not
          * the template. It cannot break out into a second declaration.
          */
-        'P'     => ['align' => '#simpletext'],
-        'H1'    => ['align' => '#simpletext'],
-        'H2'    => ['align' => '#simpletext'],
-        'H3'    => ['align' => '#simpletext'],
-        'H4'    => ['align' => '#simpletext'],
-        'H5'    => ['align' => '#simpletext'],
-        'H6'    => ['align' => '#simpletext'],
-        'MARK'  => ['color' => '#color'],
+        'P' => ['align' => '#simpletext'],
+        'H1' => ['align' => '#simpletext'],
+        'H2' => ['align' => '#simpletext'],
+        'H3' => ['align' => '#simpletext'],
+        'H4' => ['align' => '#simpletext'],
+        'H5' => ['align' => '#simpletext'],
+        'H6' => ['align' => '#simpletext'],
+        'MARK' => ['color' => '#color'],
         /*
          * 🚨 `#title` is not an s9e built-in — see Configure::resolveFilter.
          * #simpletext is ASCII-only and would reject "başlık"; the value only
@@ -256,7 +256,7 @@ abstract class Vocabulary
          * #simpletext's CSS-safety guarantee either.
          */
         'SCRIBESPOILER' => ['label' => '#title'],
-        'SCRIBEINFO'    => ['label' => '#title', 'font' => '#color', 'bg' => '#color', 'border' => '#color'],
+        'SCRIBEINFO' => ['label' => '#title', 'font' => '#color', 'bg' => '#color', 'border' => '#color'],
         'SCRIBEIMGALIGN' => ['align' => '#simpletext'],
     ];
 
@@ -269,15 +269,15 @@ abstract class Vocabulary
      * renders as a bulleted one. The editor's ordered-list node MUST set it.
      */
     public const SOURCE_ATTRIBUTES = [
-        'url'   => 'href',
-        'src'   => 'src',
+        'url' => 'href',
+        'src' => 'src',
         'color' => 'data-color',
-        'lang'  => 'data-lang',
-        'type'  => 'data-type',
+        'lang' => 'data-lang',
+        'type' => 'data-type',
         'align' => 'data-align',
-        'label'  => 'data-title',
-        'font'   => 'data-font',
-        'bg'     => 'data-bg',
+        'label' => 'data-title',
+        'font' => 'data-font',
+        'bg' => 'data-bg',
         'border' => 'data-border',
     ];
 }

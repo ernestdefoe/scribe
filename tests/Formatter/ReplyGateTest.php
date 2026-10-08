@@ -58,7 +58,7 @@ class ReplyGateTest extends TestCase
         $closed = self::$renderer->render(ReplyGate::withhold($xml));
 
         foreach (['one', 'inner', 'two'] as $secret) {
-            $this->assertStringNotContainsString('<p>' . $secret . '</p>', $closed);
+            $this->assertStringNotContainsString('<p>'.$secret.'</p>', $closed);
         }
         $this->assertStringContainsString('between', $closed);
         $this->assertSame(2, substr_count($closed, 'data-withheld'));
