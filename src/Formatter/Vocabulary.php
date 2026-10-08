@@ -264,7 +264,7 @@ abstract class Vocabulary
      * Where an attribute is named differently in the HTML the editor emits.
      *
      * 🚨 `type` on LIST is not cosmetic. Both <ul> and <ol> alias to the single
-     * LIST tag, and the template picks <ul> vs <ol> purely on whether @type is
+     * LIST tag, and the template picks <ul> vs <ol> purely on whether @var is
      * present — so an ordered list that forgets to emit data-type silently
      * renders as a bulleted one. The editor's ordered-list node MUST set it.
      */
