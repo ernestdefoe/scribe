@@ -41,7 +41,7 @@ class ReplyGate
      */
     private static ?WeakMap $known = null;
 
-    public function __invoke(Renderer $renderer, $context, string $xml, ?ServerRequestInterface $request = null): string
+    public function __invoke(Renderer $renderer, mixed $context, string $xml, ?ServerRequestInterface $request = null): string
     {
         if (! str_contains($xml, '<SCRIBEREPLY')) {
             return $xml;

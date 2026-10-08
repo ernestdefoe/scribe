@@ -1,1 +1,0 @@
-{"version":3,"file":"index.cjs","names":["Dropcursor"],"sources":["../src/index.ts"],"sourcesContent":["import { Dropcursor } from '@tiptap/extensions'\n\nexport type { DropcursorOptions } from '@tiptap/extensions'\nexport { Dropcursor } from '@tiptap/extensions'\n\nexport default Dropcursor\n"],"mappings":";;;;;;AAKA,IAAA,cAAeA,mBAAAA"}

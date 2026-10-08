@@ -1,5 +1,0 @@
-docs/.vitepress/cache
-node_modules
-vendor
-pnpm-lock.yaml
-composer.lock

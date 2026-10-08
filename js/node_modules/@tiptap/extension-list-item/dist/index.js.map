@@ -1,1 +1,0 @@
-{"version":3,"file":"index.js","names":["ListItem"],"sources":["../src/index.ts"],"sourcesContent":["import { ListItem } from '@tiptap/extension-list'\n\nexport type { ListItemOptions } from '@tiptap/extension-list'\nexport { ListItem } from '@tiptap/extension-list'\n\nexport default ListItem\n"],"mappings":";;AAKA,IAAA,cAAeA"}

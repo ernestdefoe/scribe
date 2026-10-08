@@ -1,2 +1,0 @@
-"use strict";(self.webpackChunkflarum_core=self.webpackChunkflarum_core||[]).push([[879],{9101(s,e,t){t.r(e),t.d(e,{default:()=>n});var r=t(3420),a=t(8155),u=t(4693);class n extends r.A{oninit(s){super.oninit(s),this.loadUser(m.route.param("username"))}show(s){super.show(s),this.state=new u.A({filter:{author:s.slug()},sort:"newest"}),this.state.refresh()}content(){return m("div",{className:"DiscussionsUserPage"},m(a.A,{state:this.state}))}}flarum.reg.add("core","forum/components/DiscussionsUserPage",n)}}]);
-//# sourceMappingURL=DiscussionsUserPage.js.map

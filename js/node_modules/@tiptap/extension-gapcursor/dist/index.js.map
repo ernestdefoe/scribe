@@ -1,1 +1,0 @@
-{"version":3,"file":"index.js","names":["Gapcursor"],"sources":["../src/index.ts"],"sourcesContent":["import { Gapcursor } from '@tiptap/extensions'\n\nexport { Gapcursor } from '@tiptap/extensions'\n\nexport default Gapcursor\n"],"mappings":";;AAIA,IAAA,cAAeA"}

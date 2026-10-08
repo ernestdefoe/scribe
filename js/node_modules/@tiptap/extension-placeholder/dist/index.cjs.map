@@ -1,1 +1,0 @@
-{"version":3,"file":"index.cjs","names":["Placeholder"],"sources":["../src/index.ts"],"sourcesContent":["import { Placeholder } from '@tiptap/extensions'\n\nexport type { PlaceholderOptions } from '@tiptap/extensions'\nexport { Placeholder } from '@tiptap/extensions'\n\nexport default Placeholder\n"],"mappings":";;;;;;AAKA,IAAA,cAAeA,mBAAAA"}

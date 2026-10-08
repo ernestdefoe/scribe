@@ -5,6 +5,7 @@ namespace ErnestDefoe\Scribe\Formatter;
 use Flarum\Locale\TranslatorInterface;
 use s9e\TextFormatter\Configurator;
 use s9e\TextFormatter\Configurator\Items\AttributeFilters\RegexpFilter;
+use s9e\TextFormatter\Plugins\HTMLElements\Configurator as HTMLElementsConfigurator;
 
 /**
  * Teaches the formatter to read the HTML the editor produces, and to keep
@@ -26,6 +27,9 @@ class Configure
         $this->registerTags($config, $this->resolveTokens(Vocabulary::EXTRA_TEMPLATES), Vocabulary::ATTRIBUTES);
 
         $plugin = $config->plugins->load('HTMLElements');
+        if (! $plugin instanceof HTMLElementsConfigurator) {
+            throw new \LogicException('s9e loaded something other than its HTMLElements plugin.');
+        }
 
         foreach (Vocabulary::ELEMENTS + Vocabulary::EXTRA_ELEMENTS as $element => $tag) {
             // A tag we skipped because nothing registered it (and nobody else
