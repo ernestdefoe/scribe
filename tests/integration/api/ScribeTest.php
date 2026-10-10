@@ -134,4 +134,60 @@ class ScribeTest extends TestCase
         $asked = array_filter($this->database()->getQueryLog(), fn ($q) => str_contains($q['query'], 'distinct') && str_contains($q['query'], 'discussion_id'));
         $this->assertCount(1, $asked, 'Asked once for the page, not once per post');
     }
+
+    #[Test]
+    public function entities_the_editor_writes_render_as_the_characters_they_stand_for()
+    {
+        /*
+         * TipTap serialises `&` as `&amp;` and a non-breaking space as `&nbsp;`,
+         * and text pasted from Word or WordPress is full of both (and of curly
+         * quotes). Without flarum/markdown nothing decoded them, so a member
+         * read "US &amp; UK" and "PARTNERS&nbsp;first" (Wil Vincent, 2026-10-10).
+         */
+        $id = $this->post(3, '<p>Their <strong>PARTNERS</strong>&nbsp;first. US &amp; UK &ldquo;quoted&rdquo; &#8217;s</p><h2>FBS US &amp; UK</h2>');
+        $html = $this->html($id);
+
+        $this->assertStringNotContainsString('&amp;nbsp;', $html);
+        $this->assertStringNotContainsString('&amp;amp;', $html);
+        $this->assertStringNotContainsString('&amp;ldquo;', $html);
+        $this->assertStringNotContainsString('&amp;#8217;', $html);
+        $this->assertStringContainsString('US &amp; UK', $html, 'An ampersand is one ampersand, escaped once for HTML');
+        $this->assertStringContainsString("PARTNERS</strong>\u{00A0}first", $html);
+        $this->assertStringContainsString("\u{201C}quoted\u{201D} \u{2019}s", $html);
+    }
+
+    #[Test]
+    public function a_decoded_angle_bracket_stays_text()
+    {
+        // `&lt;script&gt;` is how the editor writes someone typing "<script>".
+        // Decoded, it must still be text, never an element.
+        $html = $this->html($this->post(3, '<p>&lt;script&gt;alert(1)&lt;/script&gt; and &lt;b&gt;</p>'));
+
+        $this->assertStringNotContainsString('<script>', $html);
+        $this->assertStringNotContainsString('<b>', $html);
+        $this->assertStringContainsString('&lt;script&gt;alert(1)&lt;/script&gt;', $html);
+    }
+
+    #[Test]
+    public function the_upgrade_repairs_posts_scribe_stored_with_literal_entities_and_leaves_others_alone()
+    {
+        // As the formatter stored them before it decoded entities.
+        $scribe = '<r><P><s>&lt;p&gt;</s>US &amp;amp; UK&amp;nbsp;first<e>&lt;/p&gt;</e></P></r>';
+        $markdown = '<r><p>Tom &amp;amp; Jerry, written in Markdown</p></r>';
+        $this->app(); // the fixtures populate on boot, so insert after it
+        $this->database()->table('posts')->insert([
+            ['id' => 50, 'discussion_id' => 1, 'number' => 1, 'created_at' => Carbon::now(), 'user_id' => 3, 'type' => 'comment', 'content' => $scribe],
+            ['id' => 51, 'discussion_id' => 1, 'number' => 2, 'created_at' => Carbon::now(), 'user_id' => 3, 'type' => 'comment', 'content' => $markdown],
+        ]);
+
+        $migration = require __DIR__.'/../../../migrations/2026_10_10_000000_decode_entities_in_scribe_posts.php';
+        $migration['up']($this->database()->getSchemaBuilder());
+
+        $formatter = $this->app()->getContainer()->make(\Flarum\Formatter\Formatter::class);
+        $stored = (string) $this->database()->table('posts')->where('id', 50)->value('content');
+        $this->assertStringContainsString("US &amp; UK\u{00A0}first", $formatter->render($stored), 'Rendered as one ampersand and a real non-breaking space');
+        $this->assertSame($markdown, $this->database()->table('posts')->where('id', 51)->value('content'), 'A Markdown post is not reparsed');
+        $this->assertNull($this->database()->table('posts')->where('id', 50)->value('edited_at'), 'The repair is not an edit');
+    }
 }
+

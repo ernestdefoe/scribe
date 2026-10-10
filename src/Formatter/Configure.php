@@ -56,6 +56,23 @@ class Configure
         }
 
         /*
+         * 🚨 Decode entities in the TEXT, or they are shown as written.
+         *
+         * Scribe stores HTML, and TipTap serialises `&` as `&amp;`, a
+         * non-breaking space as `&nbsp;` and `<` typed as text as `&lt;`; text
+         * pasted from Word or WordPress adds curly quotes on top. HTMLElements
+         * only decodes attribute values, and flarum/markdown, which decoded the
+         * rest, is off wherever this editor runs. So a member read
+         * "US &amp; UK" and "PARTNERS&nbsp;first" (Wil Vincent, 2026-10-10).
+         *
+         * A decoded `&lt;` becomes the CHARACTER `<`, which is escaped again
+         * when rendered: it can never open an element.
+         */
+        if (! isset($config->HTMLEntities)) {
+            $config->plugins->load('HTMLEntities');
+        }
+
+        /*
          * Video embeds are built from a registry rather than listed in
          * Vocabulary, because each provider brings its own id pattern and its
          * own URLs. See VideoEmbed.
