@@ -3,6 +3,7 @@ import type { Editor } from '@tiptap/core';
 import ScribeToolbar from './components/ScribeToolbar';
 import { allButtons } from './toolbarButtons';
 import { toEditorContent } from './legacyInsert';
+import { wordNotesToSuperscript } from './wordNotes';
 import type EditorDriverInterface from 'flarum/common/utils/EditorDriverInterface';
 import type { EditorDriverParams } from 'flarum/common/utils/EditorDriverInterface';
 
@@ -195,6 +196,9 @@ export default class ScribeEditorDriver implements EditorDriverInterface {
 
           return true;
         },
+
+        // Word's `[i]` note marks would open a BBCode italic; see wordNotes.
+        transformPastedHTML: wordNotesToSuperscript,
       },
     } as any);
 

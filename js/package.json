@@ -49,7 +49,7 @@
     "build": "webpack --mode production",
     "format": "prettier --write src",
     "check-typings": "tsc --noEmit --project tsconfig.json",
-    "test": "tsc src/common/legacyInsert.ts src/common/video/parse.ts --rootDir src/common --outDir ../.test-build --target es2020 --module es2020 --moduleResolution node && node tests/legacyInsert.test.mjs && node tests/videoUrls.test.mjs",
+    "test": "tsc src/common/legacyInsert.ts src/common/video/parse.ts src/common/wordNotes.ts --rootDir src/common --outDir ../.test-build --target es2020 --module es2020 --moduleResolution node && node tests/legacyInsert.test.mjs && node tests/videoUrls.test.mjs && node tests/wordNotes.test.mjs",
     "format-check": "prettier --check src",
     "check-typings-coverage": "typescript-coverage-report"
   },
