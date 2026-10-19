@@ -91,9 +91,7 @@ const escape = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').rep
 
 /** Rows of plain text as table HTML in Scribe's own shape. */
 export function tsvToTableHtml(rows: string[][]): string {
-  const body = rows
-    .map((r) => '<tr>' + r.map((c) => `<td><p>${escape(c.trim()).replace(/\n/g, '<br>')}</p></td>`).join('') + '</tr>')
-    .join('');
+  const body = rows.map((r) => '<tr>' + r.map((c) => `<td><p>${escape(c.trim()).replace(/\n/g, '<br>')}</p></td>`).join('') + '</tr>').join('');
 
   return `<table><tbody>${body}</tbody></table>`;
 }

@@ -217,7 +217,10 @@ export default class ScribeEditorDriver implements EditorDriverInterface {
 
           // Tab-separated text with no HTML (Numbers, a text editor) is a grid
           // too — unless it is going into a code block, or pasted as plain text.
-          const rows = !html && !view.input?.shiftKey && view.state.selection.$from.parent.type.name !== 'codeBlock' ? tsvRows(data.getData('text/plain')) : null;
+          const rows =
+            !html && !view.input?.shiftKey && view.state.selection.$from.parent.type.name !== 'codeBlock'
+              ? tsvRows(data.getData('text/plain'))
+              : null;
           if (rows) {
             if (image) event.stopPropagation();
             view.pasteHTML(tsvToTableHtml(rows));
