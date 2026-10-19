@@ -38,6 +38,7 @@
     "@flarum/prettier-config": "^1.0.0",
     "flarum-tsconfig": "^2.0.0",
     "flarum-webpack-config": "^3.0.0",
+    "linkedom": "^0.18.12",
     "prettier": "^3.9.9",
     "typescript": "^5.0.0",
     "typescript-coverage-report": "~1.0.0",
@@ -49,7 +50,7 @@
     "build": "webpack --mode production",
     "format": "prettier --write src",
     "check-typings": "tsc --noEmit --project tsconfig.json",
-    "test": "tsc src/common/legacyInsert.ts src/common/video/parse.ts src/common/wordNotes.ts --rootDir src/common --outDir ../.test-build --target es2020 --module es2020 --moduleResolution node && node tests/legacyInsert.test.mjs && node tests/videoUrls.test.mjs && node tests/wordNotes.test.mjs",
+    "test": "tsc src/common/legacyInsert.ts src/common/video/parse.ts src/common/wordNotes.ts src/common/spreadsheetPaste.ts --rootDir src/common --outDir ../.test-build --target es2020 --lib es2020,dom,dom.iterable --module es2020 --moduleResolution node && node tests/legacyInsert.test.mjs && node tests/videoUrls.test.mjs && node tests/wordNotes.test.mjs && node tests/spreadsheetPaste.test.mjs",
     "format-check": "prettier --check src",
     "check-typings-coverage": "typescript-coverage-report"
   },

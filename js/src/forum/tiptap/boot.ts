@@ -17,3 +17,4 @@ export function createEditor(options: Omit<EditorOptions, 'extensions'> & { plac
 }
 
 export type { Editor };
+export { cleanTableHtml, hasTable, tsvRows, tsvToTableHtml } from '../../common/spreadsheetPaste';

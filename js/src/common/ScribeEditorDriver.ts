@@ -111,7 +111,8 @@ export default class ScribeEditorDriver implements EditorDriverInterface {
      * The two only agree if the module lives under src/forum, and when they
      * disagree the chunk 404s and the composer silently renders empty.
      */
-    const { createEditor } = await import('../forum/tiptap/boot');
+    // The spreadsheet paste helpers ride in the same chunk: only a composer needs them.
+    const { createEditor, cleanTableHtml, hasTable, tsvRows, tsvToTableHtml } = await import('../forum/tiptap/boot');
 
     // The composer can be closed while the chunk is still in flight.
     if (this.destroyed) return;
@@ -191,14 +192,47 @@ export default class ScribeEditorDriver implements EditorDriverInterface {
          * NOTHING — a worse bug than the one being fixed, and one that would
          * look like Scribe ignoring the clipboard entirely.
          */
-        handlePaste: (_view: unknown, event: ClipboardEvent) => {
-          if (!hasImageFile(event) || !anUploaderIsInstalled()) return false;
+        handlePaste: (view: any, event: ClipboardEvent) => {
+          const data = event.clipboardData;
+          if (!data) return false;
 
-          return true;
+          const image = hasImageFile(event);
+
+          /*
+           * 🚨 A SPREADSHEET'S CELLS ARE A TABLE, NOT A PICTURE.
+           *
+           * Excel, Google Sheets, LibreOffice Calc and Numbers put a bitmap of
+           * the copied cells on the clipboard beside the table itself, and FoF
+           * Upload's listener uploaded it: Wil Vincent's AP Poll went up as
+           * `image.png` (2026-10-19). FoF Upload listens on this.el, which
+           * ProseMirror's own listener sits inside, so stopping the event here
+           * is the only way it never hears of the paste — with or without FoF
+           * Upload installed, the table goes in.
+           */
+          const html = data.getData('text/html');
+          if (hasTable(html)) {
+            if (image) event.stopPropagation();
+            return false; // ProseMirror parses the HTML; transformPastedHTML cleans it.
+          }
+
+          // Tab-separated text with no HTML (Numbers, a text editor) is a grid
+          // too — unless it is going into a code block, or pasted as plain text.
+          const rows = !html && !view.input?.shiftKey && view.state.selection.$from.parent.type.name !== 'codeBlock' ? tsvRows(data.getData('text/plain')) : null;
+          if (rows) {
+            if (image) event.stopPropagation();
+            view.pasteHTML(tsvToTableHtml(rows));
+            return true;
+          }
+
+          return image && anUploaderIsInstalled();
         },
 
         // Word's `[i]` note marks would open a BBCode italic; see wordNotes.
-        transformPastedHTML: wordNotesToSuperscript,
+        // Office tables arrive full of styling Scribe cannot store; see spreadsheetPaste.
+        transformPastedHTML: (html: string) => {
+          html = wordNotesToSuperscript(html);
+          return hasTable(html) ? cleanTableHtml(html, new DOMParser().parseFromString(html, 'text/html')) : html;
+        },
       },
     } as any);
 
