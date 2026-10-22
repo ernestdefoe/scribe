@@ -5,6 +5,7 @@ import CommentPost from 'flarum/forum/components/CommentPost';
 import ScribeEditorDriver from '../common/ScribeEditorDriver';
 import { applyReplyGates } from './replyGate';
 import { installVideoEmbeds, localiseVideos } from './videoEmbeds';
+import { installMobileComposer } from './mobileComposer';
 
 export { default as ScribeEditorDriver } from '../common/ScribeEditorDriver';
 export { SCRIBE_BUTTONS, DEFAULT_TOOLBAR, allButtons } from '../common/toolbarButtons';
@@ -20,6 +21,9 @@ export type { ScribeTiptapKit, ScribeExtensionFactory } from '../common/registry
 app.initializers.add('ernestdefoe/scribe', () => {
   // One delegated listener for every video facade, present and future.
   installVideoEmbeds();
+
+  // Phones: the composer fits the space above the keyboard, its buttons in the toolbar.
+  installMobileComposer();
 
   /*
    * `buildEditor` is the sanctioned seam: core calls it with the container and

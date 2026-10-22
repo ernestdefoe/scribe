@@ -552,6 +552,96 @@
   .Scribe-editor {
     min-height: 40vh;
   }
+
+  /*
+   * 🚨 The phone composer fills the screen above the keyboard.
+   *
+   * Core pins a 350px box to the top of the screen. mobileComposer.ts measures
+   * the visual viewport — what the keyboard leaves — and hands it over in two
+   * variables; the editable is then sized to the rest, so the 40vh floor
+   * above must not apply (it is what pushed the controls off the panel).
+   */
+  .Composer.Scribe-fitViewport:not(.minimized) {
+    top: var(--scribe-vv-top, 0) !important;
+    height: var(--scribe-vv-height, 100%) !important;
+    max-height: none;
+
+    .Scribe-editor {
+      min-height: 0;
+    }
+  }
+
+  /*
+   * 🚨 The controls row moves into the toolbar, above the editable.
+   *
+   * Core draws preview + every extension's editor button (FoF Upload,
+   * mentions, emoji pickers…) in a row UNDER the editor. On a phone that row
+   * is the first thing the keyboard covers. `display: contents` lifts the
+   * Scribe toolbar and the editable out of their shared container so the
+   * row can sit between them, styled as one more line of the toolbar. Core
+   * still renders and redraws the buttons, so they keep working exactly as
+   * they do on desktop. Submit stays where core puts it on a phone: the
+   * paper plane in the composer's header (it is position: absolute).
+   */
+  .Composer .TextEditor:has(.Scribe-editor) {
+    display: flex;
+    flex-direction: column;
+
+    > .TextEditor-editorContainer {
+      display: contents;
+    }
+
+    .Scribe-toolbarMount {
+      order: 0;
+    }
+
+    .Scribe-toolbar {
+      border-bottom: 0;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    > .TextEditor-controls {
+      order: 1;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 2px;
+      margin: 0 0 2px;
+      padding: 0 0 6px;
+      border: 0;
+      border-bottom: 1px solid color-mix(in srgb, var(--text-color, #222) 14%, transparent);
+      white-space: normal;
+      overflow: visible;
+
+      > li {
+        margin: 0;
+      }
+
+      > .TextEditor-toolbar {
+        display: contents;
+      }
+
+      .Button--icon {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+      }
+
+      /* Core's preview button is a filled control; in the toolbar it is one more icon. */
+      .Button--icon:not(.Button--primary):not(.active):not(:hover):not(:focus-visible) {
+        background: transparent;
+      }
+    }
+
+    /*
+     * The editable, or whatever an extension wrapped it in (Mentions moves it
+     * into `.ComposerBody-mentionsWrapper`), so `order` lands on the flex item.
+     */
+    > .TextEditor-editorContainer > :not(.Scribe-toolbarMount) {
+      order: 2;
+    }
+  }
 }
 
 /*
