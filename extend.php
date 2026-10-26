@@ -11,6 +11,7 @@ use ErnestDefoe\Scribe\Formatter\BareDiscordLinks;
 use ErnestDefoe\Scribe\Formatter\BlockUploadsOutOfParagraphs;
 use ErnestDefoe\Scribe\Formatter\CodeBlocksWithoutInnerCode;
 use ErnestDefoe\Scribe\Formatter\Configure;
+use ErnestDefoe\Scribe\Formatter\DecodeEntitiesInCode;
 use ErnestDefoe\Scribe\Formatter\ReplyGate;
 use ErnestDefoe\Scribe\Formatter\VideoEmbed;
 use Flarum\Api\Resource\DiscussionResource;
@@ -75,6 +76,7 @@ return [
         ->parse(BareDiscordLinks::class)
         ->parse(BlockUploadsOutOfParagraphs::class)
         ->parse(CodeBlocksWithoutInnerCode::class)
+        ->render(DecodeEntitiesInCode::class)
         // "Reply to view" content leaves the server only for viewers entitled to it.
         ->render(ReplyGate::class),
 
