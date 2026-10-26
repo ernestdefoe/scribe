@@ -307,7 +307,25 @@ export function buildExtensions(placeholder: string) {
     Superscript,
     Subscript,
     Code,
-    CodeBlock,
+    /*
+     * 🚨 The stored source writes a code block as `<pre data-lang="php">` (see
+     * CodeBlocksWithoutInnerCode), with no inner `<code class="language-php">`
+     * for TipTap's own rule to read. Without this, editing a post dropped every
+     * code block's language, and saving it stored the block without one.
+     */
+    CodeBlock.extend({
+      addAttributes() {
+        const parent: Record<string, any> = this.parent?.() ?? {};
+
+        return {
+          ...parent,
+          language: {
+            ...parent.language,
+            parseHTML: (element: HTMLElement) => element.getAttribute('data-lang') || parent.language?.parseHTML?.(element) || null,
+          },
+        };
+      },
+    }),
     // The server has templates for all six (Vocabulary::TEMPLATES); only
     // 1-4 are exposed in the toolbar — 5/6 are visually indistinguishable
     // from body text and from each other at typical post-body font sizes.
