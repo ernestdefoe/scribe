@@ -216,7 +216,7 @@ export default class ScribeToolbar extends Component<ScribeToolbarAttrs> {
     // Reopening the same prompt closes it, so the button toggles.
     this.prompt = this.prompt === kind ? null : kind;
     this.videoError = '';
-    if (kind === 'link') this.value = editor.getAttributes('link').href ?? '';
+    if (kind === 'link') this.value = editor.getAttributes('link').href ?? editor.getAttributes('image').href ?? '';
     else if (kind === 'video') {
       const attrs = editor.getAttributes('scribeVideo');
       this.value = attrs.provider ? (watchUrl(attrs as any) ?? '') : '';
@@ -479,7 +479,7 @@ export default class ScribeToolbar extends Component<ScribeToolbarAttrs> {
       const url = this.value.trim();
       if (!url) return close();
       if (kind === 'link') {
-        editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+        (editor.chain().focus().extendMarkRange('link').setLink({ href: url }) as any).setImageLink(url).run();
       } else {
         editor.chain().focus().setImage({ src: url }).run();
       }
@@ -511,12 +511,12 @@ export default class ScribeToolbar extends Component<ScribeToolbarAttrs> {
           app.translator.trans('ernestdefoe-scribe.forum.composer.apply')
         )}
         {kind === 'link' &&
-          editor.isActive('link') &&
+          (editor.isActive('link') || !!editor.getAttributes('image').href) &&
           Button.component(
             {
               className: 'Button Button--link',
               onclick: () => {
-                editor.chain().focus().extendMarkRange('link').unsetLink().run();
+                (editor.chain().focus().extendMarkRange('link').unsetLink() as any).setImageLink(null).run();
                 close();
               },
             },

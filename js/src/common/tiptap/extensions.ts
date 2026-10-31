@@ -186,6 +186,49 @@ export const ScribeReply = Node.create({
 });
 
 /**
+ * An image with an optional link around it. TipTap's image is a block node
+ * and a link is a mark, which only inline text can carry, so a link applied
+ * across an image skipped it and `<a><img></a>` lost its link on paste or on
+ * editing the post (reported by Wil Vincent). The link lives on the image
+ * instead, read from the `<a>` it sits in and written back out around it. The
+ * server's URL filter still vets the address, as for any other link.
+ */
+const ScribeImage = Image.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      href: {
+        default: null,
+        parseHTML: (el: HTMLElement) => el.closest('a')?.getAttribute('href') || null,
+        renderHTML: () => ({}),
+      },
+    };
+  },
+  renderHTML({ node, HTMLAttributes }) {
+    const img: any = ['img', mergeAttributes(this.options.HTMLAttributes, HTMLAttributes)];
+    return node.attrs.href ? ['a', { href: node.attrs.href }, img] : img;
+  },
+  addCommands() {
+    return {
+      ...this.parent?.(),
+      // Links (or unlinks) every image in the selection, the part setLink can't reach.
+      setImageLink:
+        (href: string | null) =>
+        ({ state, tr, dispatch }: any) => {
+          const { from, to } = state.selection;
+          let found = false;
+          state.doc.nodesBetween(from, to, (node: any, pos: number) => {
+            if (node.type.name !== this.name) return;
+            found = true;
+            if (dispatch) tr.setNodeMarkup(pos, undefined, { ...node.attrs, href });
+          });
+          return found;
+        },
+    } as any;
+  },
+});
+
+/**
  * A wrapper, not an attribute directly on `<img>`. `IMG` is a tag
  * `flarum/bbcode` claims when it's enabled (Vocabulary's own comment on
  * ELEMENTS documents this — CODE/DEL/EMAIL/IMG/LI/LIST/QUOTE/URL), so an
@@ -355,7 +398,7 @@ export function buildExtensions(placeholder: string) {
      * only thing Scribe adds is the server side reading those two
      * attributes back out (Vocabulary::ATTRIBUTES['IMG']).
      */
-    Image.configure({ resize: { enabled: true, minWidth: 40, minHeight: 40 } }),
+    ScribeImage.configure({ resize: { enabled: true, minWidth: 40, minHeight: 40 } }),
     Highlight.configure({ multicolor: true }),
     History,
     Dropcursor,
