@@ -21,7 +21,8 @@
     "authors": [
         {
             "name": "Ernest Defoe",
-            "email": "ernestdefoe@ernestdefoe.online"
+            "email": "ernestdefoe@gmail.com",
+            "homepage": "https://ernestdefoe.online"
         }
     ],
     "autoload": {
