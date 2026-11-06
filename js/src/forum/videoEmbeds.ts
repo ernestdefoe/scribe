@@ -70,7 +70,9 @@ function play(facade: HTMLAnchorElement): boolean {
   const frame = document.createElement('iframe');
   frame.className = 'Scribe-videoFrame';
   frame.src = src;
-  frame.title = extractText(app.translator.trans(`ernestdefoe-scribe.forum.video.${videoLabelKey(provider, 'player_title')}`, { provider: videoBrand(provider) }));
+  frame.title = extractText(
+    app.translator.trans(`ernestdefoe-scribe.forum.video.${videoLabelKey(provider, 'player_title')}`, { provider: videoBrand(provider) })
+  );
   frame.allow = videoAllow(provider);
   frame.allowFullscreen = true;
   // YouTube refuses to play (error 153) without a referrer; this sends the
@@ -97,7 +99,10 @@ export function localiseVideos(element: HTMLElement): void {
 
     if (facade && videoProviderEnabled(provider)) {
       facade.setAttribute('role', 'button');
-      facade.setAttribute('aria-label', extractText(app.translator.trans(`ernestdefoe-scribe.forum.video.${videoLabelKey(provider, 'play')}`, { provider: brand })));
+      facade.setAttribute(
+        'aria-label',
+        extractText(app.translator.trans(`ernestdefoe-scribe.forum.video.${videoLabelKey(provider, 'play')}`, { provider: brand }))
+      );
     }
 
     const watch = figure.querySelector<HTMLElement>('.Scribe-videoWatchText');
