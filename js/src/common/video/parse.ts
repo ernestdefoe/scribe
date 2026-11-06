@@ -27,6 +27,8 @@ export interface VideoProvider {
   watch: string;
   watchStart?: string;
   thumbnail?: string;
+  kind?: 'model';
+  allow?: string;
   match: VideoMatchRule[];
 }
 

@@ -4,6 +4,8 @@
     "Each entry is an embed KIND, not a company: a YouTube Short is vertical and a YouTube video is not, so they are two entries. The key is what is stored in a post (data-provider), so a key must never be renamed once released, or every post using it stops rendering.",
     "id: the STRICT pattern for this provider's id. It is the security boundary: the server rejects a tag whose id fails it, so nothing outside it can reach an href, a src or an iframe.",
     "match: how a pasted URL is recognised. hosts are exact (after lower-casing and dropping a leading www.), so youtube.com.evil.example and facebook.com@evil.example match nothing. path is matched against the URL path; the id comes from its (?<id>) group, or from the query parameter named in query.",
+    "kind: \"model\" for a 3D viewer rather than a video, so its labels say \"View … 3D model\" instead of \"Play … video\".",
+    "allow: extra iframe permissions a provider's player needs, added to the ones every player gets. Only a fixed word list from this file, never from a post.",
     "embed / watch / thumbnail: built ONLY from the validated id (and start). {id}, {start} (seconds), {startHms} (1h2m3s) and, for embed only, {host} (the forum's own host, for Twitch's parent=) are the only placeholders. embedStart / watchStart are appended only when the post has a start time.",
     "Never a provider whose embed needs a URL we cannot rebuild from the id. fb.watch, vm.tiktok.com and facebook.com/share/ links are redirects that need a request to resolve, Rumble's embed id is not in its public URL, Kick has no stable clip embed, and X/Twitter needs its widgets script: all of those stay ordinary links."
   ],
@@ -188,6 +190,20 @@
       "watchStart": "?t={start}",
       "match": [
         { "hosts": ["loom.com"], "path": "^/(?:share|embed)/(?<id>[0-9a-f]{32})/?$" }
+      ]
+    },
+    "sketchfab": {
+      "name": "Sketchfab",
+      "kind": "model",
+      "icon": "fas fa-cube",
+      "aspect": "16:9",
+      "id": "[0-9a-f]{32}",
+      "embed": "https://sketchfab.com/models/{id}/embed?autostart=1",
+      "watch": "https://sketchfab.com/models/{id}",
+      "allow": "xr-spatial-tracking",
+      "match": [
+        { "hosts": ["sketchfab.com"], "path": "^/models/(?<id>[0-9a-f]{32})(?:/embed)?/?$" },
+        { "hosts": ["sketchfab.com"], "path": "^/3d-models/(?:[^/]*-)?(?<id>[0-9a-f]{32})/?$" }
       ]
     }
   }

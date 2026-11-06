@@ -71,6 +71,7 @@ class VideoEmbedTest extends TestCase
             'streamable' => ['streamable', 'moo2xy', 'https://streamable.com/moo2xy'],
             'dailymotion' => ['dailymotion', 'x8abc12', 'https://www.dailymotion.com/video/x8abc12'],
             'loom' => ['loom', '0123456789abcdef0123456789abcdef', 'https://www.loom.com/share/0123456789abcdef0123456789abcdef'],
+            'sketchfab' => ['sketchfab', '559b4fe0bf8342f3ae25370ffaa40d0a', 'https://sketchfab.com/models/559b4fe0bf8342f3ae25370ffaa40d0a'],
         ];
     }
 
@@ -122,6 +123,17 @@ class VideoEmbedTest extends TestCase
         $this->assertStringContainsString('Scribe-videoPoster', $vimeo);
     }
 
+    public function test_a_3d_model_is_viewed_not_played(): void
+    {
+        $html = $this->render($this->video('sketchfab', '559b4fe0bf8342f3ae25370ffaa40d0a'));
+
+        $this->assertStringContainsString('aria-label="View Sketchfab 3D model"', $html);
+        $this->assertStringContainsString('View on Sketchfab', $html);
+        $this->assertStringContainsString('Scribe-video--r16x9', $html);
+        $this->assertStringNotContainsString('<img', $html);
+        $this->assertStringNotContainsString('video', strtolower(strip_tags(str_replace(['Scribe-video', 'data-provider'], '', $html))));
+    }
+
     public function test_vertical_formats_get_the_vertical_ratio(): void
     {
         $this->assertStringContainsString('Scribe-video--r9x16', $this->render($this->video('youtubeshorts', 'dQw4w9WgXcQ')));
@@ -140,6 +152,8 @@ class VideoEmbedTest extends TestCase
             'quote breakout' => ['<video data-provider="youtube" data-id="dQw4w9WgXc&quot; onerror=&quot;alert(1)"></video>'],
             'javascript id' => ['<video data-provider="youtube" data-id="javascript:alert(1)"></video>'],
             'url as id' => ['<video data-provider="youtube" data-id="https://evil.example/x"></video>'],
+            'sketchfab upper-case id' => ['<video data-provider="sketchfab" data-id="559B4FE0BF8342F3AE25370FFAA40D0A"></video>'],
+            'sketchfab url as id' => ['<video data-provider="sketchfab" data-id="https://evil.example/559b4fe0bf8342f3ae25370ffaa40d0a"></video>'],
             'path traversal' => ['<video data-provider="loom" data-id="../../../../evil"></video>'],
             'provider case trick' => ['<video data-provider="YouTube" data-id="dQw4w9WgXcQ"></video>'],
             'provider with suffix' => ['<video data-provider="youtube evil" data-id="dQw4w9WgXcQ"></video>'],

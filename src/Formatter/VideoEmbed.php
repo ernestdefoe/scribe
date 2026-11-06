@@ -168,8 +168,12 @@ class VideoEmbed
             $icon = $this->xml($p['icon'] ?? 'fas fa-video');
             $watch = $this->url($p['watch'], $p['watchStart'] ?? null);
             // An attribute value in a template is an AVT: a brace in a translation would be read as an expression.
-            $play = $this->avt($translate('ernestdefoe-scribe.forum.video.play', 'Play {provider} video', ['provider' => $brand]));
-            $watchLabel = $this->xml($translate('ernestdefoe-scribe.forum.video.watch_on', 'Watch on {provider}', ['provider' => $brand]));
+            // A 3D model is viewed, not played.
+            [$playKey, $playText, $watchKey, $watchText] = ($p['kind'] ?? null) === 'model'
+                ? ['play_model', 'View {provider} 3D model', 'view_on', 'View on {provider}']
+                : ['play', 'Play {provider} video', 'watch_on', 'Watch on {provider}'];
+            $play = $this->avt($translate('ernestdefoe-scribe.forum.video.'.$playKey, $playText, ['provider' => $brand]));
+            $watchLabel = $this->xml($translate('ernestdefoe-scribe.forum.video.'.$watchKey, $watchText, ['provider' => $brand]));
             $k = $this->xml($key);
 
             $visual = isset($p['thumbnail'])

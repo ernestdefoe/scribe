@@ -82,6 +82,10 @@ const VALID = [
   ['https://dai.ly/x8abc12', 'dailymotion', 'x8abc12'],
   ['https://www.loom.com/share/0123456789abcdef0123456789abcdef', 'loom', '0123456789abcdef0123456789abcdef'],
   ['https://www.loom.com/share/0123456789abcdef0123456789abcdef?sid=1', 'loom', '0123456789abcdef0123456789abcdef'],
+  ['https://sketchfab.com/models/559b4fe0bf8342f3ae25370ffaa40d0a', 'sketchfab', '559b4fe0bf8342f3ae25370ffaa40d0a'],
+  ['https://sketchfab.com/models/559b4fe0bf8342f3ae25370ffaa40d0a/embed', 'sketchfab', '559b4fe0bf8342f3ae25370ffaa40d0a'],
+  ['https://sketchfab.com/3d-models/the-great-drawing-room-559b4fe0bf8342f3ae25370ffaa40d0a', 'sketchfab', '559b4fe0bf8342f3ae25370ffaa40d0a'],
+  ['https://www.sketchfab.com/3d-models/559b4fe0bf8342f3ae25370ffaa40d0a?utm_source=x', 'sketchfab', '559b4fe0bf8342f3ae25370ffaa40d0a'],
 ];
 
 for (const [url, provider, id, start] of VALID) {
@@ -129,6 +133,11 @@ const REJECTED = [
   'https://www.facebook.com/watch/?v=12ab',
   'https://www.espn.com/watch/player?id=0b5e7f1a-uuid-like',
   'https://www.loom.com/share/not-a-hex-id',
+  'https://sketchfab.com/models/559B4FE0BF8342F3AE25370FFAA40D0A',
+  'https://sketchfab.com/models/559b4fe0bf8342f3ae25370ffaa40d0ax',
+  'https://sketchfab.com/3d-models/thing-559b4fe0bf8342f3ae25370ffaa40d0a/../../evil',
+  'https://sketchfab.com.evil.example/models/559b4fe0bf8342f3ae25370ffaa40d0a',
+  'https://sketchfab.com/someone/models',
   'https://clips.twitch.tv/embed',
   'https://streamable.com/login',
   // Redirect links that need a request to resolve, and unsupported sites.
@@ -177,6 +186,10 @@ check('embed URLs', () => {
   assert.equal(
     buildEmbedSrc(registry, { provider: 'espn', id: '39876543' }, 'x'),
     'https://www.espn.com/core/video/iframe/_/id/39876543/'
+  );
+  assert.equal(
+    buildEmbedSrc(registry, { provider: 'sketchfab', id: '559b4fe0bf8342f3ae25370ffaa40d0a' }, 'x'),
+    'https://sketchfab.com/models/559b4fe0bf8342f3ae25370ffaa40d0a/embed?autostart=1'
   );
 });
 

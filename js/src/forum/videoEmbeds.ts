@@ -1,6 +1,6 @@
 import app from 'flarum/forum/app';
 import extractText from 'flarum/common/utils/extractText';
-import { embedSrc, isValidVideo, videoBrand, videoProviderEnabled } from '../common/video/providers';
+import { embedSrc, isValidVideo, videoAllow, videoBrand, videoLabelKey, videoProviderEnabled } from '../common/video/providers';
 
 /**
  * Click-to-load: the rendered video is a facade (a thumbnail or poster, linking
@@ -70,8 +70,8 @@ function play(facade: HTMLAnchorElement): boolean {
   const frame = document.createElement('iframe');
   frame.className = 'Scribe-videoFrame';
   frame.src = src;
-  frame.title = extractText(app.translator.trans('ernestdefoe-scribe.forum.video.player_title', { provider: videoBrand(provider) }));
-  frame.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen; clipboard-write';
+  frame.title = extractText(app.translator.trans(`ernestdefoe-scribe.forum.video.${videoLabelKey(provider, 'player_title')}`, { provider: videoBrand(provider) }));
+  frame.allow = videoAllow(provider);
   frame.allowFullscreen = true;
   // YouTube refuses to play (error 153) without a referrer; this sends the
   // origin only, never the page path.
@@ -97,11 +97,11 @@ export function localiseVideos(element: HTMLElement): void {
 
     if (facade && videoProviderEnabled(provider)) {
       facade.setAttribute('role', 'button');
-      facade.setAttribute('aria-label', extractText(app.translator.trans('ernestdefoe-scribe.forum.video.play', { provider: brand })));
+      facade.setAttribute('aria-label', extractText(app.translator.trans(`ernestdefoe-scribe.forum.video.${videoLabelKey(provider, 'play')}`, { provider: brand })));
     }
 
     const watch = figure.querySelector<HTMLElement>('.Scribe-videoWatchText');
-    const label = extractText(app.translator.trans('ernestdefoe-scribe.forum.video.watch_on', { provider: brand }));
+    const label = extractText(app.translator.trans(`ernestdefoe-scribe.forum.video.${videoLabelKey(provider, 'watch_on')}`, { provider: brand }));
     if (watch && label && watch.textContent !== label) watch.textContent = label;
   });
 }

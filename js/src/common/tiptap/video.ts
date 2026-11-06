@@ -3,7 +3,7 @@ import extractText from 'flarum/common/utils/extractText';
 import { Extension, Node, mergeAttributes, type Editor } from '@tiptap/core';
 import { Plugin, PluginKey, NodeSelection } from '@tiptap/pm/state';
 import type { Node as PMNode } from '@tiptap/pm/model';
-import { VIDEO_PROVIDERS, isValidVideo, thumbnailUrl, videoBrand, videoFromUrl, videoRatioClass } from '../video/providers';
+import { VIDEO_PROVIDERS, isValidVideo, thumbnailUrl, videoBrand, videoFromUrl, videoLabelKey, videoRatioClass } from '../video/providers';
 import { insertVideo } from '../video/insert';
 
 /**
@@ -267,7 +267,7 @@ class VideoNodeView {
     this.watch.replaceChildren();
     const wi = el('i', `icon ${icon}`);
     wi.setAttribute('aria-hidden', 'true');
-    this.watch.append(wi, document.createTextNode(' ' + t('watch_on', { provider: brand })));
+    this.watch.append(wi, document.createTextNode(' ' + t(videoLabelKey(provider, 'watch_on'), { provider: brand })));
   }
 
   private select() {

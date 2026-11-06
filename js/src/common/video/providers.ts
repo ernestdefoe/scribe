@@ -52,6 +52,19 @@ export function videoBrand(provider: string): string {
   return def ? (def.brand ?? def.name) : provider;
 }
 
+/** A label's key under forum.video: a 3D model is viewed, not played. */
+export function videoLabelKey(provider: string, key: 'play' | 'watch_on' | 'player_title'): string {
+  if (VIDEO_PROVIDERS[provider]?.kind !== 'model') return key;
+  return { play: 'play_model', watch_on: 'view_on', player_title: 'model_viewer_title' }[key];
+}
+
+/** Permissions a provider's player needs beyond the ones every player gets. */
+export function videoAllow(provider: string): string {
+  const extra = VIDEO_PROVIDERS[provider]?.allow;
+  const base = 'autoplay; encrypted-media; picture-in-picture; fullscreen; clipboard-write';
+  return extra && /^[a-z-]+(?:; [a-z-]+)*$/.test(extra) ? `${base}; ${extra}` : base;
+}
+
 /** "16:9" → "16x9", the suffix of the Scribe-video--r* class the stylesheet sizes by. */
 export function videoRatioClass(provider: string): string {
   return 'Scribe-video--r' + (VIDEO_PROVIDERS[provider]?.aspect ?? '16:9').replace(':', 'x');
