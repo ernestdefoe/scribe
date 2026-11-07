@@ -389,7 +389,17 @@ export function buildExtensions(placeholder: string) {
     Blockquote,
     HardBreak,
     HorizontalRule,
-    Link.configure({ openOnClick: false, autolink: true }),
+    /*
+     * 🚨 Not inclusive. TipTap makes a link inclusive whenever autolink is on,
+     * so whatever was typed straight after a pasted link joined it — "…/polls)."
+     * and the rest of the line became part of the link (Wil Vincent, Safari).
+     * Autolink still links a typed address when the space after it goes in.
+     */
+    Link.extend({
+      inclusive() {
+        return false;
+      },
+    }).configure({ openOnClick: false, autolink: true }),
     ScribeLinkShortcut,
     /*
      * 🚨 `resize` is TipTap's own built-in — the corner-drag handles, the
