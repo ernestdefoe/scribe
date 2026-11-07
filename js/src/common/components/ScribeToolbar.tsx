@@ -5,8 +5,7 @@ import Button from 'flarum/common/components/Button';
 import Tooltip from 'flarum/common/components/Tooltip';
 import extractText from 'flarum/common/utils/extractText';
 import type { Editor } from '@tiptap/core';
-import { buttonsFor, DEFAULT_TOOLBAR, ALIGN_ACTIONS, TABLE_ACTIONS, type ScribeButton } from '../toolbarButtons';
-import { registeredButtons } from '../registry';
+import { buttonsFor, configuredToolbar, speechSupported, ALIGN_ACTIONS, TABLE_ACTIONS, type ScribeButton } from '../toolbarButtons';
 import { insertVideo } from '../video/insert';
 import { anyVideoFromUrl, videoBrand, videoEmbedsEnabled, videoFromUrl, watchUrl } from '../video/providers';
 
@@ -14,7 +13,7 @@ import { anyVideoFromUrl, videoBrand, videoEmbedsEnabled, videoFromUrl, watchUrl
  * A registered button carries its own full translation key; Scribe's own
  * carry a suffix under Scribe's namespace.
  */
-function buttonLabel(b: ScribeButton): string {
+export function buttonLabel(b: ScribeButton): string {
   return app.translator.trans(b.translationKey ?? `ernestdefoe-scribe.lib.buttons.${b.label}`) as string;
 }
 
@@ -42,6 +41,17 @@ export function formatShortcut(shortcut: string): string {
 function tooltipText(b: ScribeButton): string {
   const label = buttonLabel(b);
   return b.shortcut ? `${label} (${formatShortcut(b.shortcut)})` : label;
+}
+
+/**
+ * Whether a configured button can be offered here: embeds switched off in the
+ * AdminCP leave no button that would make one, and a browser with no speech
+ * recogniser gets no microphone. Shared with the `/` menu.
+ */
+export function available(b: ScribeButton): boolean {
+  if (b.key === 'video') return videoEmbedsEnabled();
+  if (b.key === 'voice') return speechSupported();
+  return true;
 }
 
 export interface ScribeToolbarAttrs extends ComponentAttrs {
@@ -103,16 +113,6 @@ export default class ScribeToolbar extends Component<ScribeToolbarAttrs> {
     const editor = this.attrs.editor;
     if (!editor) return null;
 
-    /*
-     * An admin who has never touched the setting gets the defaults PLUS
-     * whatever other extensions have registered.
-     *
-     * 🚨 Only on the default path. Once the toolbar has been arranged by hand
-     * that arrangement is an explicit decision, and an extension installed
-     * later must not silently push a button into it. The admin finds it in the
-     * builder's palette instead — which is why anything registering a button
-     * still has to work without it (see common/registry.ts).
-     */
     // Ctrl/⌘+K, bound in the editor (see ScribeLinkShortcut), opens the same
     // link form as the button. The toolbar owns that form, so it hands the
     // editor a way in.
@@ -134,15 +134,21 @@ export default class ScribeToolbar extends Component<ScribeToolbarAttrs> {
       };
     }
 
-    const saved = app.forum.attribute<string[] | null>('scribeToolbar');
-    const configured = saved ?? [...DEFAULT_TOOLBAR, ...registeredButtons().map((b) => b.key)];
+    // The `/` menu offers the same buttons; the prompts it picks are drawn here.
+    const slashStorage = (editor.storage as any).scribeSlash;
+    if (slashStorage) {
+      slashStorage.openPrompt = (kind: NonNullable<ScribeButton['prompt']>) => {
+        this.prompt = null;
+        this.openPrompt(kind, editor);
+        this.attrs.onChange();
+      };
+    }
 
     return (
       <div className="Scribe-toolbarWrap">
         <div className="Scribe-toolbar" role="toolbar" aria-label={app.translator.trans('ernestdefoe-scribe.forum.composer.toolbar_label')}>
-          {buttonsFor(configured)
-            // Embeds switched off in the AdminCP: no button that would make one.
-            .filter((b) => b.key !== 'video' || videoEmbedsEnabled())
+          {buttonsFor(configuredToolbar())
+            .filter(available)
             .map((b) => this.button(b, editor))}
         </div>
         {this.prompt && this.promptRow(editor)}
@@ -166,6 +172,7 @@ export default class ScribeToolbar extends Component<ScribeToolbarAttrs> {
           // Screen readers announce the shortcut the tooltip shows.
           'aria-keyshortcuts': b.shortcut ? b.shortcut.replace('Mod', IS_MAC ? 'Meta' : 'Control').replace(/-/g, '+') : undefined,
           'data-badge': b.badge,
+          'data-key': b.key,
           disabled: b.enabled ? !b.enabled(editor) : false,
           onclick: () => {
             if (b.prompt) {

@@ -60,6 +60,92 @@
   }
 }
 
+/*
+ * Listening: the microphone turns red inside a red ring that pulses, so it is
+ * obvious from across the room that the page is hearing you.
+ *
+ * 🚨 A ring, not a fill. Core gives `.Button--link` `background: transparent
+ * !important` in every state, so a red fill never showed — and a white icon
+ * meant for it left an empty white square where the microphone was.
+ */
+.Scribe-toolbarButton[data-key="voice"].is-active,
+.Scribe-toolbarButton[data-key="voice"].is-active:hover {
+  color: #d83e3e;
+  box-shadow: inset 0 0 0 2px #d83e3e;
+  animation: Scribe-listening 1.4s ease-in-out infinite;
+}
+
+@keyframes Scribe-listening {
+  50% { box-shadow: inset 0 0 0 2px #d83e3e, 0 0 0 4px fade(#d83e3e, 30%); }
+}
+
+/* What the recognizer is still hearing, at the cursor. */
+.Scribe-interim {
+  color: var(--muted-color, #777);
+  font-style: italic;
+  margin-inline-start: 0.25em;
+  pointer-events: none;
+}
+
+/*
+ * The `/` menu. On <body>, fixed, so the composer's overflow can't clip it;
+ * slashMenu.tsx places it and caps its height to the room it has.
+ */
+.Scribe-slashMenu {
+  position: fixed;
+  z-index: calc(var(--zindex-composer, 1020) + 15);
+  min-width: 200px;
+  max-width: ~"min(300px, calc(100vw - 16px))";
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 4px;
+  background: var(--body-bg, #fff);
+  color: var(--text-color, #222);
+  border: 1px solid color-mix(in srgb, var(--text-color, #222) 14%, transparent);
+  border-radius: 8px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+}
+
+.Scribe-slashItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  color: var(--text-color, #222);
+  cursor: pointer;
+  user-select: none;
+
+  .icon {
+    position: relative;
+    flex: 0 0 18px;
+    text-align: center;
+    color: var(--muted-color, #777);
+
+    &[data-badge]::after {
+      content: attr(data-badge);
+      position: absolute;
+      right: -4px;
+      bottom: -3px;
+      font: 700 9px/1 var(--font-family, sans-serif);
+    }
+  }
+
+  &.is-active {
+    background: color-mix(in srgb, var(--text-color, #222) 10%, transparent);
+
+    .icon { color: var(--text-color, #222); }
+  }
+}
+
+.Scribe-slashLabel {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .Scribe-prompt {
   display: flex;
   align-items: center;
@@ -860,6 +946,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .Scribe-toolbarButton[data-key="voice"].is-active {
+    animation: none;
+  }
+
   .Scribe-videoThumb,
   .Scribe-videoPlay { transition: none; }
 }

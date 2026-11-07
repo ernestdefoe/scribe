@@ -5,7 +5,6 @@ import { allButtons, DEFAULT_TOOLBAR, type ScribeButton } from '../../common/too
 
 declare const m: any;
 
-const SETTING = 'ernestdefoe-scribe.toolbar';
 const t = (k: string) => app.translator.trans('ernestdefoe-scribe.admin.' + k);
 
 /**
@@ -21,6 +20,11 @@ const t = (k: string) => app.translator.trans('ernestdefoe-scribe.admin.' + k);
 export interface ToolbarBuilderAttrs {
   /** The ExtensionPage's setting stream, so its own Save button persists this. */
   setting: (value?: string) => string;
+  /** The heading and help above the builder. */
+  label?: string;
+  help?: string;
+  /** What an empty setting and the Reset button mean. */
+  defaults?: () => string[];
 }
 
 export default class ToolbarBuilder extends Component<ToolbarBuilderAttrs> {
@@ -41,7 +45,7 @@ export default class ToolbarBuilder extends Component<ToolbarBuilderAttrs> {
   }
 
   load(): string[] {
-    const raw = this.attrs.setting() ?? app.data.settings?.[SETTING];
+    const raw = this.attrs.setting();
     try {
       const parsed = raw ? JSON.parse(raw) : null;
       if (Array.isArray(parsed) && parsed.length) {
@@ -54,7 +58,11 @@ export default class ToolbarBuilder extends Component<ToolbarBuilderAttrs> {
       // A corrupt value is not worth an error dialog — fall back to defaults and
       // let saving overwrite it.
     }
-    return [...DEFAULT_TOOLBAR];
+    return this.defaults();
+  }
+
+  defaults(): string[] {
+    return this.attrs.defaults?.() ?? [...DEFAULT_TOOLBAR];
   }
 
   byKey(key: string): ScribeButton | undefined {
@@ -68,8 +76,8 @@ export default class ToolbarBuilder extends Component<ToolbarBuilderAttrs> {
   view() {
     return (
       <div className="ScribeToolbarBuilder Form-group">
-        <label>{t('toolbar_label')}</label>
-        <div className="helpText">{t('toolbar_help')}</div>
+        <label>{this.attrs.label ?? t('toolbar_label')}</label>
+        <div className="helpText">{this.attrs.help ?? t('toolbar_help')}</div>
 
         <div
           className={'ScribeBuilder-toolbar' + (this.dragKey ? ' is-dropTarget' : '')}
@@ -111,7 +119,7 @@ export default class ToolbarBuilder extends Component<ToolbarBuilderAttrs> {
            * page's own setting stream, so its Save persists them along with
            * everything else on the page.
            */}
-          {Button.component({ className: 'Button Button--link', onclick: () => this.commit([...DEFAULT_TOOLBAR]) }, t('reset'))}
+          {Button.component({ className: 'Button Button--link', onclick: () => this.commit(this.defaults()) }, t('reset'))}
         </div>
       </div>
     );

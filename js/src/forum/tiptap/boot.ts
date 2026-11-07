@@ -18,3 +18,8 @@ export function createEditor(options: Omit<EditorOptions, 'extensions'> & { plac
 
 export type { Editor };
 export { cleanTableHtml, hasTable, tsvRows, tsvToTableHtml } from '../../common/spreadsheetPaste';
+// Paste clean-up rides here too: only a composer pastes.
+export { cleanPastedHtml, isEditorHtml } from '../../common/pasteClean';
+export { wordNotesToSuperscript } from '../../common/wordNotes';
+export { toEditorContent } from '../../common/legacyInsert';
+export { looksLikeMarkdown, markdownToHtml, isStyledPlainText } from '../../common/markdownPaste';

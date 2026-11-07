@@ -1,9 +1,7 @@
 import type Mithril from 'mithril';
 import type { Editor } from '@tiptap/core';
 import ScribeToolbar from './components/ScribeToolbar';
-import { allButtons } from './toolbarButtons';
-import { toEditorContent } from './legacyInsert';
-import { wordNotesToSuperscript } from './wordNotes';
+import { allButtons, configuredToolbar } from './toolbarButtons';
 import type EditorDriverInterface from 'flarum/common/utils/EditorDriverInterface';
 import type { EditorDriverParams } from 'flarum/common/utils/EditorDriverInterface';
 
@@ -34,6 +32,8 @@ export default class ScribeEditorDriver implements EditorDriverInterface {
 
   private params: EditorDriverParams;
   private ready: Promise<void>;
+  /** legacyInsert's translator, from the editor chunk once it has loaded. */
+  private toEditorContent: (text: string) => string | null = () => null;
   private destroyed = false;
   /** Which buttons are lit. The toolbar only redraws when this changes. */
   private activeSignature = '';
@@ -111,8 +111,22 @@ export default class ScribeEditorDriver implements EditorDriverInterface {
      * The two only agree if the module lives under src/forum, and when they
      * disagree the chunk 404s and the composer silently renders empty.
      */
-    // The spreadsheet paste helpers ride in the same chunk: only a composer needs them.
-    const { createEditor, cleanTableHtml, hasTable, tsvRows, tsvToTableHtml } = await import('../forum/tiptap/boot');
+    // The paste and Markdown-insert helpers ride in the same chunk: only a composer needs them.
+    const {
+      wordNotesToSuperscript,
+      createEditor,
+      cleanTableHtml,
+      hasTable,
+      tsvRows,
+      tsvToTableHtml,
+      cleanPastedHtml,
+      isEditorHtml,
+      looksLikeMarkdown,
+      markdownToHtml,
+      isStyledPlainText,
+      toEditorContent,
+    } = await import('../forum/tiptap/boot');
+    this.toEditorContent = toEditorContent;
 
     // The composer can be closed while the chunk is still in flight.
     if (this.destroyed) return;
@@ -215,26 +229,61 @@ export default class ScribeEditorDriver implements EditorDriverInterface {
             return false; // ProseMirror parses the HTML; transformPastedHTML cleans it.
           }
 
-          // Tab-separated text with no HTML (Numbers, a text editor) is a grid
-          // too — unless it is going into a code block, or pasted as plain text.
-          const rows =
-            !html && !view.input?.shiftKey && view.state.selection.$from.parent.type.name !== 'codeBlock'
-              ? tsvRows(data.getData('text/plain'))
-              : null;
+          // Plain text, unless it is going into a code block or pasted as plain text.
+          const text = data.getData('text/plain');
+          const asText = !view.input?.shiftKey && view.state.selection.$from.parent.type.name !== 'codeBlock';
+
+          /*
+           * 🚨 Ctrl/⌘+Shift+V means "exactly the characters I copied". The
+           * browser hands over plain text, but TipTap's paste rules still turned
+           * `**x**` bold and `~~x~~` struck through on the way in. Inserted as
+           * content instead of pasted, they never run: one paragraph per line,
+           * as ProseMirror's own plain paste does.
+           */
+          if (view.input?.shiftKey && text && !image && view.state.selection.$from.parent.type.name !== 'codeBlock') {
+            const lines = text.replace(/\r\n?/g, '\n').split(/\n+/);
+            const content =
+              lines.length === 1
+                ? { type: 'text', text: lines[0] }
+                : lines.map((line: string) => ({ type: 'paragraph', content: line ? [{ type: 'text', text: line }] : [] }));
+            this.editor!.chain().focus().insertContent(content).run();
+            return true;
+          }
+
+          // Tab-separated text with no HTML (Numbers, a text editor) is a grid too.
+          const rows = !html && asText ? tsvRows(text) : null;
           if (rows) {
             if (image) event.stopPropagation();
             view.pasteHTML(tsvToTableHtml(rows));
             return true;
           }
 
+          /*
+           * Markdown copied as text (a README, a chatbot's answer) becomes
+           * formatting. Real formatting on the clipboard wins; a code editor's
+           * coloured copy of a Markdown file is still text (isStyledPlainText).
+           */
+          if (asText && !image && (!html || isStyledPlainText(html)) && looksLikeMarkdown(text)) {
+            view.pasteHTML(markdownToHtml(text));
+            return true;
+          }
+
           return image && anUploaderIsInstalled();
         },
 
-        // Word's `[i]` note marks would open a BBCode italic; see wordNotes.
-        // Office tables arrive full of styling Scribe cannot store; see spreadsheetPaste.
+        /*
+         * Word's `[i]` note marks would open a BBCode italic; see wordNotes.
+         * Word, Google Docs and web pages arrive full of styling Scribe cannot
+         * store; see pasteClean. Office tables get their own pass; see
+         * spreadsheetPaste. A copy out of this editor is already clean.
+         */
         transformPastedHTML: (html: string) => {
+          if (isEditorHtml(html)) return html;
           html = wordNotesToSuperscript(html);
-          return hasTable(html) ? cleanTableHtml(html, new DOMParser().parseFromString(html, 'text/html')) : html;
+          const doc = new DOMParser().parseFromString(html, 'text/html');
+          const toolbar = configuredToolbar();
+          cleanPastedHtml(doc, { color: toolbar.includes('color'), highlight: toolbar.includes('highlight') });
+          return hasTable(html) ? cleanTableHtml(html, doc) : doc.body.innerHTML;
         },
       },
     } as any);
@@ -319,7 +368,7 @@ export default class ScribeEditorDriver implements EditorDriverInterface {
       if (start !== end) chain.deleteRange({ from: start, to: end });
       // Other extensions still speak Markdown through this interface — quoting
       // a post and finishing an upload both arrive here as Markdown.
-      chain.insertContentAt(start, toEditorContent(text) ?? text).run();
+      chain.insertContentAt(start, this.toEditorContent(text) ?? text).run();
     });
   }
 

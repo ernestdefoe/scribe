@@ -28,6 +28,8 @@ import { Table, TableRow, TableCell, TableHeader } from '@tiptap/extension-table
 import { Extension, Mark, Node, mergeAttributes } from '@tiptap/core';
 import { registeredExtensions } from '../registry';
 import { ScribeVideo, ScribeVideoPaste } from './video';
+import { ScribeVoice } from './voice';
+import { ScribeSlashMenu } from './slashMenu';
 
 /**
  * A colour is stored in `data-color` and filtered server-side by s9e's #color.
@@ -427,6 +429,8 @@ export function buildExtensions(placeholder: string) {
     TableHeader,
     TableCell,
     Placeholder.configure({ placeholder }),
+    ScribeVoice,
+    ScribeSlashMenu,
     /*
      * Nodes, marks and behaviours registered by other extensions, built here
      * rather than at registration time so they get TipTap without depending on

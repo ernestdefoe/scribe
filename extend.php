@@ -102,11 +102,16 @@ return [
      * instead of throwing inside the composer and leaving no editor at all.
      */
     (new Extend\Settings)
-        ->serializeToForum('scribeToolbar', 'ernestdefoe-scribe.toolbar', function ($value) {
+        ->serializeToForum('scribeToolbar', 'ernestdefoe-scribe.toolbar', $toolbar = function ($value) {
             $decoded = json_decode((string) $value, true);
 
             return is_array($decoded) && $decoded !== [] ? array_values(array_filter($decoded, 'is_string')) : null;
         })
+        // A phone toolbar is optional: null means phones get the one above.
+        ->serializeToForum('scribeToolbarPhone', 'ernestdefoe-scribe.toolbar_phone', $toolbar)
+        // The `/` quick-insert menu; on unless the admin switches it off.
+        ->default('ernestdefoe-scribe.slash_menu', true)
+        ->serializeToForum('scribeSlashMenu', 'ernestdefoe-scribe.slash_menu', fn ($value) => (bool) $value)
         /*
          * Video embeds. These decide what the EDITOR does with a pasted link and
          * whether a click loads the player in the page; they never change how a

@@ -1,3 +1,4 @@
+import app from 'flarum/common/app';
 import type { Editor } from '@tiptap/core';
 import { registeredButtons } from './registry';
 
@@ -208,6 +209,18 @@ export const SCRIBE_BUTTONS: ScribeButton[] = [
   { key: 'video', icon: 'fas fa-film', label: 'video', prompt: 'video', active: (e) => e.isActive('scribeVideo') },
   { key: 'table', icon: 'fas fa-table', label: 'table', prompt: 'tableMenu' },
   { key: 'horizontalRule', icon: 'fas fa-minus', label: 'horizontal_rule', run: (e) => e.chain().focus().setHorizontalRule().run() },
+  /*
+   * Voice typing. The recogniser lives in the editor chunk (tiptap/voice.ts),
+   * so all forum.js carries is this entry; a browser without the Web Speech
+   * API (Firefox) never shows it — see speechSupported().
+   */
+  {
+    key: 'voice',
+    icon: 'fas fa-microphone',
+    label: 'voice',
+    active: (e) => !!(e.storage as any).scribeVoice?.listening,
+    run: (e) => (e.storage as any).scribeVoice?.toggle(),
+  },
   { key: 'undo', shortcut: 'Mod-z', icon: 'fas fa-undo', label: 'undo', enabled: (e) => e.can().undo(), run: (e) => e.chain().focus().undo().run() },
   {
     key: 'redo',
@@ -333,6 +346,30 @@ export const TABLE_ACTIONS: ScribeButton[] = [
  */
 export function allButtons(): ScribeButton[] {
   return [...SCRIBE_BUTTONS, ...registeredButtons()];
+}
+
+/** Whether this browser can do voice typing at all. */
+export function speechSupported(): boolean {
+  return typeof window !== 'undefined' && !!((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition);
+}
+
+/**
+ * The toolbar this reader gets, as button keys: the phone arrangement on a
+ * phone when the admin made one, the desktop one otherwise.
+ *
+ * An admin who has never touched the setting gets the defaults PLUS whatever
+ * other extensions have registered.
+ *
+ * 🚨 Only on the default path. Once the toolbar has been arranged by hand
+ * that arrangement is an explicit decision, and an extension installed later
+ * must not silently push a button into it. The admin finds it in the
+ * builder's palette instead — which is why anything registering a button
+ * still has to work without it (see common/registry.ts).
+ */
+export function configuredToolbar(): string[] {
+  const phone = app.screen() === 'phone' ? app.forum.attribute<string[] | null>('scribeToolbarPhone') : null;
+  const saved = phone ?? app.forum.attribute<string[] | null>('scribeToolbar');
+  return saved ?? [...DEFAULT_TOOLBAR, ...registeredButtons().map((b) => b.key)];
 }
 
 export function buttonsFor(keys: string[]): ScribeButton[] {

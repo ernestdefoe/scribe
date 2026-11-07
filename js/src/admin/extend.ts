@@ -1,16 +1,18 @@
 import Extend from 'flarum/common/extenders';
-import ToolbarBuilder from './components/ToolbarBuilder';
+import ComposerSettings from './components/ComposerSettings';
 import VideoSettings from './components/VideoSettings';
 
 declare const m: any;
-
-const SETTING = 'ernestdefoe-scribe.toolbar';
 
 export default [
   new Extend.Admin().customSetting(function (this: any) {
     // `this` is the ExtensionPage, so the builder writes into the same stream
     // as every other setting and the page's own Save button persists it.
-    return m(ToolbarBuilder, { setting: this.setting(SETTING) });
+    return m(ComposerSettings, {
+      toolbar: this.setting('ernestdefoe-scribe.toolbar'),
+      toolbarPhone: this.setting('ernestdefoe-scribe.toolbar_phone'),
+      slashMenu: this.setting('ernestdefoe-scribe.slash_menu', '1'),
+    });
   }, 10),
   new Extend.Admin().customSetting(function (this: any) {
     return m(VideoSettings, {
