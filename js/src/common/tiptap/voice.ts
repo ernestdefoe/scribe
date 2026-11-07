@@ -5,6 +5,9 @@ import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { Decoration, DecorationSet } from '@tiptap/pm/view';
 import { joinDictation, speechLang } from '../dictation';
 
+/** Why voice typing stopped, in the reader's language. */
+const fail = (key: string) => extractText(app.translator.trans(`ernestdefoe-scribe.forum.voice.${key}`));
+
 /** What is being heard but not yet settled, drawn at the cursor. */
 const interimKey = new PluginKey<string>('scribeVoice');
 
@@ -40,12 +43,12 @@ export const ScribeVoice = Extension.create({
   name: 'scribeVoice',
 
   addStorage() {
-    return { listening: false, toggle: () => {}, stop: () => {}, abort: () => {} };
+    return { listening: false, error: '', toggle: () => {}, stop: () => {}, abort: () => {} };
   },
 
   onCreate() {
     const editor = this.editor;
-    const storage = this.storage as { listening: boolean; toggle: () => void; stop: () => void; abort: () => void };
+    const storage = this.storage as { listening: boolean; error: string; toggle: () => void; stop: () => void; abort: () => void };
     const Recognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
     let recognition: any = null;
@@ -103,8 +106,20 @@ export const ScribeVoice = Extension.create({
       r.onerror = (event: any) => {
         const message = ERRORS[event.error];
         if (!message) return; // no-speech, aborted: onend decides
-        wanted = false;
-        app.alerts.show({ type: 'error' }, extractText(app.translator.trans(`ernestdefoe-scribe.forum.voice.${message}`)));
+        /*
+         * 🚨 Stop here, not in onend: Safari reports `not-allowed` and then
+         * never ends the session, so the microphone stayed red forever.
+         * The reason goes under the toolbar, not into a Flarum alert, which
+         * slides in at the bottom of a phone screen — under the keyboard.
+         */
+        storage.error = fail(message);
+        interim = '';
+        finish();
+        try {
+          r.abort();
+        } catch (e) {
+          // Already over.
+        }
       };
 
       r.onend = () => {
@@ -145,6 +160,7 @@ export const ScribeVoice = Extension.create({
       if (!Recognition) return;
 
       wanted = true;
+      storage.error = '';
       heard = false;
       quiet = 0;
       storage.listening = true;
@@ -153,8 +169,8 @@ export const ScribeVoice = Extension.create({
       try {
         listen();
       } catch (e) {
+        storage.error = fail('failed');
         finish();
-        app.alerts.show({ type: 'error' }, extractText(app.translator.trans('ernestdefoe-scribe.forum.voice.failed')));
         return;
       }
       show('');

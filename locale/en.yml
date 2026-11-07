@@ -67,11 +67,12 @@ ernestdefoe-scribe:
     # Voice typing: shown when the browser's speech recognizer refuses.
     voice:
       denied: Microphone access is blocked. Allow it for this site in your browser's settings, then tap the microphone again.
-      unavailable: Speech recognition is turned off on this device. On an iPhone or iPad, turn on Dictation in Settings › General › Keyboard.
+      unavailable: Speech recognition is blocked or turned off on this device. On an iPhone or iPad, allow it in Settings › Privacy & Security › Speech Recognition, and turn on Dictation in Settings › General › Keyboard.
       no_microphone: No microphone was found.
       network: Speech recognition needs an internet connection. Check your connection and try again.
       language: Your browser can't recognize speech in this language.
       failed: Voice typing couldn't start. Try again.
+      dismiss: Dismiss
 
     # The menu that opens when you type / at the start of a line.
     slash:

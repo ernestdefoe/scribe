@@ -152,7 +152,32 @@ export default class ScribeToolbar extends Component<ScribeToolbarAttrs> {
             .map((b) => this.button(b, editor))}
         </div>
         {this.prompt && this.promptRow(editor)}
+        {this.voiceError(editor)}
       </div>
+    );
+  }
+
+  /**
+   * Why voice typing stopped, under the toolbar where a phone's keyboard
+   * cannot cover it. Gone on the next tap of the microphone, or on ×.
+   */
+  voiceError(editor: Editor) {
+    const voice = (editor.storage as any).scribeVoice;
+    if (!voice?.error) return null;
+
+    return (
+      <p className="Scribe-promptError Scribe-voiceError" role="alert">
+        {voice.error}
+        {Button.component({
+          className: 'Button Button--icon Button--link Scribe-voiceErrorClose',
+          icon: 'fas fa-times',
+          'aria-label': app.translator.trans('ernestdefoe-scribe.forum.voice.dismiss'),
+          onclick: () => {
+            voice.error = '';
+            this.attrs.onChange();
+          },
+        })}
+      </p>
     );
   }
 
