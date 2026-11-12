@@ -49,3 +49,29 @@ export function embeddedImages(doc: Document): File[] {
 
   return files;
 }
+
+/**
+ * Whether a pasted image's address is one a post can show: on the web, or
+ * relative to the page it was copied from.
+ *
+ * 🚨 A PASTED blob: OR file: PICTURE WAS SAVED AS RAW HTML TEXT. Web apps
+ * (Teams, Outlook on the web) copy a picture as `<img src="blob:…">`, an
+ * address that only exists inside their own tab, and Word copies its pictures
+ * as `file:///C:/…`, a path on the copier's own disk. The editor showed a
+ * broken picture, and the server, which only takes web addresses, kept the
+ * whole tag as literal text in the post. So only addresses that work for
+ * every reader are allowed, not a list of the ones that don't.
+ */
+export function isWebImage(src: string): boolean {
+  const address = src.trim();
+  return /^https?:\/\//i.test(address) || !/^[a-z][a-z0-9+.-]*:/i.test(address);
+}
+
+/** Whether the HTML is nothing but pictures, none of them with a web address. */
+export function unreachableImagesOnly(doc: Document): boolean {
+  const body = doc.body;
+  if (!body || (body.textContent || '').trim()) return false;
+
+  const images = Array.from(body.querySelectorAll('img'));
+  return images.length > 0 && images.every((img) => !isWebImage(img.getAttribute('src') || ''));
+}

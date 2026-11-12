@@ -74,6 +74,11 @@ ernestdefoe-scribe:
       failed: Voice typing couldn't start. Try again.
       dismiss: Dismiss
 
+    # Shown under the toolbar when a pasted picture has no web address
+    # (copied from Teams or Outlook on the web, or a picture in Word).
+    paste:
+      unreachable_image: That picture can't be pasted from where you copied it. Save it to your device and upload it instead.
+
     # The menu that opens when you type / at the start of a line.
     slash:
       label: Insert

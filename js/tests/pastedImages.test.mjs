@@ -7,7 +7,7 @@
 import assert from 'node:assert/strict';
 import { DOMParser } from 'linkedom';
 import { check, done } from './_harness.mjs';
-import { embeddedImages } from '../../.test-build/pastedImages.js';
+import { embeddedImages, isWebImage, unreachableImagesOnly } from '../../.test-build/pastedImages.js';
 
 const parse = (html) => new DOMParser().parseFromString(/<html[\s>]/i.test(html) ? html : `<html><body>${html}</body></html>`, 'text/html');
 const files = (html) => embeddedImages(parse(html));
@@ -69,6 +69,23 @@ check('not base64, or not decodable: nothing uploads', () => {
 check('no picture at all', () => {
   assert.equal(files('<p></p>').length, 0);
   assert.equal(files('').length, 0);
+});
+
+check('web and relative addresses are web pictures; blob:, file: and the rest are not', () => {
+  for (const src of ['https://example.com/a.png', 'http://example.com/a.png', '/assets/files/a.png', '//cdn.example.com/a.png', 'a.png']) {
+    assert.equal(isWebImage(src), true, src);
+  }
+  for (const src of ['blob:https://teams.microsoft.com/1', 'file:///C:/a.png', 'cid:image001.png@01D', 'webkit-fake-url://x/a.png', 'javascript:alert(1)', png]) {
+    assert.equal(isWebImage(src), false, src);
+  }
+});
+
+check('a paste of only unreachable pictures is told apart from one with words or a web picture', () => {
+  assert.equal(unreachableImagesOnly(parse('<img src="blob:https://teams.microsoft.com/1">')), true);
+  assert.equal(unreachableImagesOnly(parse('<p><img src="file:///C:/a.png"><img src="blob:x"></p>')), true);
+  assert.equal(unreachableImagesOnly(parse('<p>Hi <img src="blob:x"></p>')), false);
+  assert.equal(unreachableImagesOnly(parse('<img src="blob:x"><img src="https://example.com/a.png">')), false);
+  assert.equal(unreachableImagesOnly(parse('<p></p>')), false);
 });
 
 done();

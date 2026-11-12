@@ -20,7 +20,7 @@ export type { Editor };
 export { cleanTableHtml, hasTable, tsvRows, tsvToTableHtml } from '../../common/spreadsheetPaste';
 // Paste clean-up rides here too: only a composer pastes.
 export { cleanPastedHtml, isEditorHtml } from '../../common/pasteClean';
-export { embeddedImages } from '../../common/pastedImages';
+export { embeddedImages, unreachableImagesOnly } from '../../common/pastedImages';
 export { wordNotesToSuperscript } from '../../common/wordNotes';
 export { toEditorSource } from '../../common/legacySource';
 export { toEditorContent } from '../../common/legacyInsert';

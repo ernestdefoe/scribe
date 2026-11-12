@@ -945,15 +945,15 @@
   color: var(--control-danger-color, #d83e3e);
 }
 
-/* Why voice typing stopped: a line under the toolbar, with its own close. */
-.Scribe-voiceError {
+/* Why voice typing stopped, or a paste went nowhere: a line under the toolbar, with its own close. */
+.Scribe-notice {
   display: flex;
   align-items: center;
   gap: 4px;
   padding: 6px 0;
   border-bottom: 1px solid var(--scribe-line, rgba(0, 0, 0, 0.14));
 
-  .Scribe-voiceErrorClose.Button--icon {
+  .Scribe-noticeClose.Button--icon {
     flex: 0 0 auto;
     width: 28px;
     height: 28px;

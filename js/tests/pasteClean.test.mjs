@@ -106,4 +106,23 @@ check('only colours with real hue count', () => {
   }
 });
 
+check('a blob: picture (Teams, Outlook on the web) is dropped, not saved as raw text', () => {
+  assert.equal(clean('<p><img src="blob:https://teams.microsoft.com/1234-5678"></p>'), '');
+});
+
+check('a file: picture (Word) is dropped', () => {
+  assert.equal(clean('<p><img src="file:///C:/Users/me/AppData/Local/Temp/msohtmlclip1/01/clip_image002.png" width="200"></p>'), '');
+});
+
+check('a mixed paste keeps its words and loses only the unreachable picture', () => {
+  assert.equal(clean('<p>Before <img src="blob:https://teams.microsoft.com/1"> after</p><p>Next</p>'), '<p>Before after</p><p>Next</p>');
+});
+
+check('a web picture in a mixed paste is untouched', () => {
+  assert.equal(
+    clean('<p>Look <img src="https://example.com/a.png" alt="A" style="width:10px"> and <img src="file:///C:/b.png"></p>'),
+    '<p>Look <img src="https://example.com/a.png" alt="A"> and </p>'
+  );
+});
+
 done();

@@ -56,6 +56,9 @@ export function available(b: ScribeButton): boolean {
 
 export interface ScribeToolbarAttrs extends ComponentAttrs {
   editor?: Editor;
+  /** A line about the last paste, from the driver; see ScribeEditorDriver.showNotice. */
+  notice?: string;
+  onDismissNotice?: () => void;
   /** The driver re-renders us; we are not in Flarum's redraw cycle. */
   onChange: () => void;
 }
@@ -153,6 +156,7 @@ export default class ScribeToolbar extends Component<ScribeToolbarAttrs> {
         </div>
         {this.prompt && this.promptRow(editor)}
         {this.voiceError(editor)}
+        {this.attrs.notice && this.notice(this.attrs.notice, () => this.attrs.onDismissNotice?.())}
       </div>
     );
   }
@@ -165,17 +169,22 @@ export default class ScribeToolbar extends Component<ScribeToolbarAttrs> {
     const voice = (editor.storage as any).scribeVoice;
     if (!voice?.error) return null;
 
+    return this.notice(voice.error, () => {
+      voice.error = '';
+      this.attrs.onChange();
+    });
+  }
+
+  /** A line under the toolbar, with its own close. */
+  notice(text: string, onclose: () => void) {
     return (
-      <p className="Scribe-promptError Scribe-voiceError" role="alert">
-        {voice.error}
+      <p className="Scribe-promptError Scribe-notice" role="alert">
+        {text}
         {Button.component({
-          className: 'Button Button--icon Button--link Scribe-voiceErrorClose',
+          className: 'Button Button--icon Button--link Scribe-noticeClose',
           icon: 'fas fa-times',
           'aria-label': app.translator.trans('ernestdefoe-scribe.forum.voice.dismiss'),
-          onclick: () => {
-            voice.error = '';
-            this.attrs.onChange();
-          },
+          onclick: onclose,
         })}
       </p>
     );

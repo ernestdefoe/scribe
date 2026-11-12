@@ -23,6 +23,7 @@
  *
  * Kept free of TipTap and the editor so the tests can run it in Node.
  */
+import { isWebImage } from './pastedImages';
 
 export interface PasteCleanOptions {
   /** The toolbar has the text colour button: keep real text colours. */
@@ -199,6 +200,13 @@ export function cleanPastedHtml(doc: Document, options: PasteCleanOptions): void
     }
 
     if (inline) unwrap(el);
+  });
+
+  // A picture only the copier's tab or disk can see would be saved as raw text; see isWebImage.
+  // An embedded one stays: pastedImages uploads those, and the editor drops the rest.
+  body.querySelectorAll('img').forEach((img) => {
+    const src = img.getAttribute('src') || '';
+    if (!isWebImage(src) && !/^data:image\//i.test(src.trim())) img.remove();
   });
 
   // Every attribute not worth keeping goes; Scribe's own classes and data

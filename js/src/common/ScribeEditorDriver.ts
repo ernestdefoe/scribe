@@ -1,5 +1,7 @@
 import type Mithril from 'mithril';
 import type { Editor } from '@tiptap/core';
+import app from 'flarum/common/app';
+import extractText from 'flarum/common/utils/extractText';
 import ScribeToolbar from './components/ScribeToolbar';
 import { allButtons, configuredToolbar } from './toolbarButtons';
 import type EditorDriverInterface from 'flarum/common/utils/EditorDriverInterface';
@@ -37,6 +39,8 @@ export default class ScribeEditorDriver implements EditorDriverInterface {
   private destroyed = false;
   /** Which buttons are lit. The toolbar only redraws when this changes. */
   private activeSignature = '';
+  /** A line under the toolbar about the last paste, until it is dismissed or the post changes. */
+  private notice = '';
 
   constructor(dom: HTMLElement, params: EditorDriverParams) {
     this.params = params;
@@ -122,6 +126,7 @@ export default class ScribeEditorDriver implements EditorDriverInterface {
       cleanPastedHtml,
       isEditorHtml,
       embeddedImages,
+      unreachableImagesOnly,
       looksLikeMarkdown,
       markdownToHtml,
       isStyledPlainText,
@@ -148,6 +153,7 @@ export default class ScribeEditorDriver implements EditorDriverInterface {
         // calling it from the input listeners as well makes every keypress
         // cost O(document).
         this.params.oninput(this.editor!.getHTML());
+        if (this.notice) this.showNotice('');
 
         /*
          * 🚨 Fire a native `input` event, because a textarea would have.
@@ -232,11 +238,19 @@ export default class ScribeEditorDriver implements EditorDriverInterface {
            */
           const html = data.getData('text/html');
 
-          // A picture that came only inside the HTML is uploaded like any other; see pastedImages.
-          if (!image && html && anUploaderIsInstalled()) {
-            const files = embeddedImages(new DOMParser().parseFromString(html, 'text/html'));
+          if (!image && html) {
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+
+            // A picture that came only inside the HTML is uploaded like any other; see pastedImages.
+            const files = anUploaderIsInstalled() ? embeddedImages(doc) : [];
             if (files.length) {
               this.uploadFiles(files);
+              return true;
+            }
+
+            // A picture only the copier could see goes nowhere; say so rather than paste nothing.
+            if (unreachableImagesOnly(doc)) {
+              this.showNotice(extractText(app.translator.trans('ernestdefoe-scribe.forum.paste.unreachable_image')));
               return true;
             }
           }
@@ -335,6 +349,11 @@ export default class ScribeEditorDriver implements EditorDriverInterface {
     }
   }
 
+  private showNotice(text: string): void {
+    this.notice = text;
+    this.renderToolbar();
+  }
+
   /**
    * Hands files to the uploader as a drop of them.
    *
@@ -367,7 +386,10 @@ export default class ScribeEditorDriver implements EditorDriverInterface {
    */
   private renderToolbar(): void {
     if (this.destroyed) return;
-    m.render(this.toolbarEl, m(ScribeToolbar, { editor: this.editor, onChange: () => this.renderToolbar() }));
+    m.render(
+      this.toolbarEl,
+      m(ScribeToolbar, { editor: this.editor, notice: this.notice, onDismissNotice: () => this.showNotice(''), onChange: () => this.renderToolbar() })
+    );
   }
 
   /**
