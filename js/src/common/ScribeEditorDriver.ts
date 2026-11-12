@@ -250,7 +250,9 @@ export default class ScribeEditorDriver implements EditorDriverInterface {
 
             // A picture only the copier could see goes nowhere; say so rather than paste nothing.
             if (unreachableImagesOnly(doc)) {
-              this.showNotice(extractText(app.translator.trans('ernestdefoe-scribe.forum.paste.unreachable_image')));
+              // Without an uploader there is nowhere to upload it, so no such advice.
+              const key = anUploaderIsInstalled() ? 'unreachable_image' : 'unreachable_image_no_upload';
+              this.showNotice(extractText(app.translator.trans(`ernestdefoe-scribe.forum.paste.${key}`)));
               return true;
             }
           }
