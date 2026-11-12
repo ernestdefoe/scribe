@@ -17,13 +17,19 @@
 import { markdownToHtml } from './markdownPaste';
 
 /**
- * Whether a stored source is HTML Scribe wrote. Scribe's output always opens
- * with a block element; a Markdown post opens with text, a mark, `#`, `-`, `>`
- * or a BBCode tag. Starting with an HTML block tag is the one thing a
- * Markdown post never did by accident.
+ * Whether a stored source is HTML Scribe wrote.
+ *
+ * Scribe's output always opens with an element: a block (`<p>`, `<h2>`,
+ * `<table>`, `<video>`…), an image (`<img>`), a linked image (`<a href>`), or
+ * a node another extension registered, with a tag of its own. So ANY opening
+ * tag counts, never a list of known ones: a list missed the linked image, and
+ * would miss every node registered later (tests/fixtures/scribe-first-nodes).
+ *
+ * A Markdown or BBCode post opens with text, `#`, `-`, `>`, `[` or an
+ * autolink `<https://…>`, none of which is an element.
  */
 export function isScribeSource(source: string): boolean {
-  return /^\s*<(p|h[1-6]|ul|ol|li|blockquote|pre|table|details|aside|section|figure|video|hr|img|div|br)[\s/>]/i.test(source);
+  return /^\s*<[a-z][a-z0-9-]*[\s/>]/i.test(source);
 }
 
 /** The source as the editor should load it. */

@@ -12,7 +12,10 @@
 
 import assert from 'node:assert/strict';
 import { check, done } from './_harness.mjs';
+import { readFileSync } from 'node:fs';
 import { toEditorSource, isScribeSource } from '../../.test-build/legacySource.js';
+
+const firstNodes = JSON.parse(readFileSync(new URL('./fixtures/scribe-first-nodes.json', import.meta.url), 'utf8'));
 
 check('the reported post: two paragraphs and real bold', () => {
   assert.equal(toEditorSource('Line one\n\nWhat do you think **this**'), '<p>Line one</p><p>What do you think <strong>this</strong></p>');
@@ -33,6 +36,35 @@ check('a post Scribe wrote loads exactly as saved', () => {
   ]) {
     assert.ok(isScribeSource(html), html);
     assert.equal(toEditorSource(html), html);
+  }
+});
+
+check('every node Scribe can put first in a post is recognized as Scribe HTML and loads untouched', () => {
+  const cases = Object.entries(firstNodes.cases);
+  assert.ok(cases.length >= 25, 'fixture holds the captured cases');
+  for (const [node, html] of cases) {
+    assert.ok(isScribeSource(html), `${node}: ${html}`);
+    assert.equal(toEditorSource(html), html, node);
+  }
+  // Nodes other extensions register bring tags of their own.
+  for (const html of ['<embed data-ruffle="x"></embed>', '<div data-recipe="1"><p>x</p></div>', '<scribe-thing data-x="1"></scribe-thing>']) {
+    assert.ok(isScribeSource(html), html);
+  }
+});
+
+check('a schema node with no captured case fails the test, so a new node is not missed', () => {
+  const covered = { doc: 1, text: 1, listItem: 1, tableRow: 1, tableHeader: 1, tableCell: 1, hardBreak: 1 };
+  const names = Object.keys(firstNodes.cases).join(' ').toLowerCase();
+  const byNode = { paragraph: 'paragraph', codeBlock: 'codeblock', heading: 'heading', bulletList: 'bulletlist', orderedList: 'orderedlist', blockquote: 'blockquote', horizontalRule: 'horizontalrule', image: 'image', scribeImageAlign: 'aligned image', scribeSpoiler: 'spoiler', scribeInfo: 'info box', scribeReply: 'reply gate', scribeVideo: 'youtube', table: 'table' };
+  for (const node of firstNodes.schemaNodes) {
+    if (covered[node]) continue;
+    assert.ok(byNode[node] && names.includes(byNode[node]), `no first-node case for "${node}": add one to tests/fixtures/scribe-first-nodes.json`);
+  }
+});
+
+check('Markdown and BBCode never look like Scribe HTML', () => {
+  for (const md of ['<https://flarum.org> is the site', '<3 this', '# Title', '[b]x[/b]', '> quote', '- item', '**bold**', '@"Wil"#p1 hi']) {
+    assert.ok(!isScribeSource(md), md);
   }
 });
 
