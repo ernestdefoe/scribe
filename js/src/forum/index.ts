@@ -6,6 +6,7 @@ import ScribeEditorDriver from '../common/ScribeEditorDriver';
 import { applyReplyGates } from './replyGate';
 import { installVideoEmbeds, localiseVideos } from './videoEmbeds';
 import { installMobileComposer } from './mobileComposer';
+import { addQuoteBreaks } from '../common/quoteBreaks';
 
 export { default as ScribeEditorDriver } from '../common/ScribeEditorDriver';
 export { SCRIBE_BUTTONS, DEFAULT_TOOLBAR, allButtons } from '../common/toolbarButtons';
@@ -63,6 +64,10 @@ app.initializers.add('ernestdefoe/scribe', () => {
     const element = (this as any).element as HTMLElement | undefined;
     if (element) {
       applyReplyGates(element, (this as any).attrs.post);
+      // So quoting part of the post keeps its paragraphs; see quoteBreaks.
+      const body = element.querySelector('.Post-body');
+      // Core has just run the body's scripts (super.refreshContent above).
+      if (body) addQuoteBreaks(body, true);
       try {
         localiseVideos(element);
       } catch (e) {
