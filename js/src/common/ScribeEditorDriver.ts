@@ -125,8 +125,13 @@ export default class ScribeEditorDriver implements EditorDriverInterface {
       markdownToHtml,
       isStyledPlainText,
       toEditorContent,
+      toEditorSource,
     } = await import('../forum/tiptap/boot');
     this.toEditorContent = toEditorContent;
+
+    const original = this.params.value || '';
+    const converted = toEditorSource(original);
+    const legacySource = converted !== original;
 
     // The composer can be closed while the chunk is still in flight.
     if (this.destroyed) return;
@@ -134,7 +139,8 @@ export default class ScribeEditorDriver implements EditorDriverInterface {
     this.editor = createEditor({
       element: this.el,
       placeholder: this.params.placeholder,
-      content: this.params.value || '',
+      // A post written before Scribe stores Markdown, not HTML; see legacySource.
+      content: converted,
       editable: !this.params.disabled,
       onUpdate: () => {
         // Serialise on change only. getHTML() walks the whole document, so
@@ -288,7 +294,34 @@ export default class ScribeEditorDriver implements EditorDriverInterface {
       },
     } as any);
 
+    if (legacySource) this.adoptConvertedSource(original);
+
     this.renderToolbar();
+  }
+
+  /**
+   * An old post's Markdown, now loaded as formatting, becomes the composer's
+   * content straight away rather than at the first keystroke.
+   *
+   * 🚨 Until then the composer still held the Markdown, and Flarum's live
+   * preview of the post being edited showed it as `**this**` beside an editor
+   * showing bold. It also becomes the composer's ORIGINAL content, so closing
+   * an edit nobody changed does not ask about unsaved changes.
+   */
+  private adoptConvertedSource(original: string): void {
+    const html = this.editor!.getHTML();
+    this.params.oninput(html);
+    /*
+     * EditPostComposer fills `originalContent` from the post on its own copy
+     * of the attributes, which Flarum rebuilds from the composer state on every
+     * redraw and only defaults when unset — so set it on the state, then redraw.
+     */
+    const body = (globalThis as any).app?.composer?.body;
+    const before = body?.attrs?.originalContent ?? body?.attrs?.post?.content?.();
+    if (body?.attrs && before === original) {
+      body.attrs.originalContent = html;
+      m.redraw();
+    }
   }
 
   /**

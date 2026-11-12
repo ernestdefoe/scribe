@@ -21,5 +21,6 @@ export { cleanTableHtml, hasTable, tsvRows, tsvToTableHtml } from '../../common/
 // Paste clean-up rides here too: only a composer pastes.
 export { cleanPastedHtml, isEditorHtml } from '../../common/pasteClean';
 export { wordNotesToSuperscript } from '../../common/wordNotes';
+export { toEditorSource } from '../../common/legacySource';
 export { toEditorContent } from '../../common/legacyInsert';
 export { looksLikeMarkdown, markdownToHtml, isStyledPlainText } from '../../common/markdownPaste';

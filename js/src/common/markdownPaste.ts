@@ -74,11 +74,23 @@ function safeUrl(url: string): string | null {
   return /^(https?:\/\/|mailto:)/i.test(u) ? u : null;
 }
 
+/**
+ * Reading a post's stored source (legacySource.ts) rather than a paste: a
+ * line break inside a paragraph is a <br>, as Flarum rendered it, and the
+ * extras Flarum's Markdown and fof/rich-text wrote (`^sup^`, `~sub~`) and
+ * BBCode count too. Set only for the length of one markdownToHtml() call.
+ */
+let legacy = false;
+
 /** Inline Markdown: code spans, images, links, bold, italic, strikethrough. */
 export function inlineMarkdown(text: string): string {
   // Code spans first, held aside, so nothing inside them is formatted.
   const codes: string[] = [];
   let out = text.replace(/`([^`\n]+)`/g, (_, code) => `\u0000${codes.push(code) - 1}\u0000`);
+
+  // A backslash makes the next mark literal (`\*` is an asterisk): held aside too.
+  const escaped: string[] = [];
+  out = out.replace(/\\([\\`*_{}[\]()#+\-.!~|>^<])/g, (_, ch) => `\u0001${escaped.push(ch) - 1}\u0001`);
 
   out = escapeHtml(out);
 
@@ -97,7 +109,40 @@ export function inlineMarkdown(text: string): string {
   out = out.replace(/(^|[^\w_])_(?=\S)([^_\n]*?\S)_(?!\w)/g, '$1<em>$2</em>');
   out = out.replace(/~~(?=\S)([^~\n]*?\S)~~/g, '<s>$1</s>');
 
-  return out.replace(/\u0000(\d+)\u0000/g, (_, i) => `<code>${escapeHtml(codes[+i])}</code>`);
+  if (legacy) {
+    out = out.replace(/\^(?=\S)([^^\s]+)\^/g, '<sup>$1</sup>');
+    out = out.replace(/(^|[^~])~(?=\S)([^~\s]+)~(?!~)/g, '$1<sub>$2</sub>');
+    out = bbcodeInline(out);
+  }
+
+  return out
+    .replace(/\u0000(\d+)\u0000/g, (_, i) => `<code>${escapeHtml(codes[+i])}</code>`)
+    .replace(/\u0001(\d+)\u0001/g, (_, i) => escapeHtml(escaped[+i]));
+}
+
+/**
+ * Inline BBCode (flarum/bbcode), on text already HTML-escaped. Tags with no
+ * counterpart in a post ([color], [size], [center]) keep their text and lose
+ * the tag.
+ */
+function bbcodeInline(out: string): string {
+  const pairs: Record<string, string> = { b: 'strong', i: 'em', u: 'u', s: 's', del: 's', sup: 'sup', sub: 'sub' };
+  for (const [tag, html] of Object.entries(pairs)) {
+    out = out.replace(new RegExp(`\\[${tag}\\]([\\s\\S]*?)\\[/${tag}\\]`, 'gi'), `<${html}>$1</${html}>`);
+  }
+  out = out.replace(/\[url=([^\]\s]+)\]([\s\S]*?)\[\/url\]/gi, (whole, href, label) => {
+    const safe = safeUrl(href.replace(/&amp;/g, '&').replace(/^&quot;|&quot;$/g, ''));
+    return safe ? `<a href="${escapeHtml(safe)}">${label}</a>` : whole;
+  });
+  out = out.replace(/\[url\]([^\[\s]+)\[\/url\]/gi, (whole, href) => {
+    const safe = safeUrl(href.replace(/&amp;/g, '&'));
+    return safe ? `<a href="${escapeHtml(safe)}">${href}</a>` : whole;
+  });
+  out = out.replace(/\[img\]([^\[\s]+)\[\/img\]/gi, (whole, src) => {
+    const safe = safeUrl(src.replace(/&amp;/g, '&'));
+    return safe ? `<img src="${escapeHtml(safe)}" alt="">` : whole;
+  });
+  return out.replace(/\[\/?(?:color|size|center|left|right|font)(?:=[^\]]*)?\]/gi, '');
 }
 
 function cells(row: string): string[] {
@@ -110,15 +155,20 @@ function cells(row: string): string[] {
 }
 
 /** Markdown as HTML in the shapes the editor parses. */
-export function markdownToHtml(text: string): string {
-  return blocks(text.replace(/\r\n?/g, '\n').split('\n'));
+export function markdownToHtml(text: string, options: { legacy?: boolean } = {}): string {
+  legacy = !!options.legacy;
+  try {
+    return blocks(text.replace(/\r\n?/g, '\n').split('\n'));
+  } finally {
+    legacy = false;
+  }
 }
 
 function blocks(lines: string[]): string {
   const out: string[] = [];
   let para: string[] = [];
   const flush = () => {
-    if (para.length) out.push(`<p>${para.map(inlineMarkdown).join(' ')}</p>`);
+    if (para.length) out.push(`<p>${para.map(inlineMarkdown).join(legacy ? '<br>' : ' ')}</p>`);
     para = [];
   };
 
