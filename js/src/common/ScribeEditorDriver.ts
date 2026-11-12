@@ -121,6 +121,7 @@ export default class ScribeEditorDriver implements EditorDriverInterface {
       tsvToTableHtml,
       cleanPastedHtml,
       isEditorHtml,
+      embeddedImages,
       looksLikeMarkdown,
       markdownToHtml,
       isStyledPlainText,
@@ -230,6 +231,16 @@ export default class ScribeEditorDriver implements EditorDriverInterface {
            * Upload installed, the table goes in.
            */
           const html = data.getData('text/html');
+
+          // A picture that came only inside the HTML is uploaded like any other; see pastedImages.
+          if (!image && html && anUploaderIsInstalled()) {
+            const files = embeddedImages(new DOMParser().parseFromString(html, 'text/html'));
+            if (files.length) {
+              this.uploadFiles(files);
+              return true;
+            }
+          }
+
           if (hasTable(html)) {
             if (image) event.stopPropagation();
             return false; // ProseMirror parses the HTML; transformPastedHTML cleans it.
@@ -322,6 +333,23 @@ export default class ScribeEditorDriver implements EditorDriverInterface {
       body.attrs.originalContent = html;
       m.redraw();
     }
+  }
+
+  /**
+   * Hands files to the uploader as a drop of them.
+   *
+   * FoF Upload keeps its uploader to itself and listens for files dropped on
+   * the composer, so a drop carrying only the files is the way in. It starts
+   * at this element, not at ProseMirror's inside it, so the editor never sees
+   * it.
+   *
+   * 🚨 A drop, not a paste: Firefox empties the clipboardData of a paste event
+   * made in script, so the uploader got no files there.
+   */
+  private uploadFiles(files: File[]): void {
+    const data = new DataTransfer();
+    files.forEach((file) => data.items.add(file));
+    this.el.dispatchEvent(new DragEvent('drop', { dataTransfer: data, bubbles: true, cancelable: true }));
   }
 
   /**
