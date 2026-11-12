@@ -20,10 +20,31 @@
 const BLOCKS = 'p, h1, h2, h3, h4, h5, h6, li, blockquote, tr, details, summary, aside, section, figure, figcaption, dt, dd';
 const CELLS = 'td, th';
 
-/** Adds the breaks under `root`. Safe to run again on the same content. */
-export function addQuoteBreaks(root: Element, scriptsHaveRun = false): void {
+/** White-space values under which a "\n" (or a tab) is drawn. */
+const DRAWN = /^(pre|pre-wrap|pre-line|break-spaces)/;
+
+/**
+ * Adds the breaks under `root`. Safe to run again on the same content.
+ *
+ * 🚨 Never where white-space is drawn. Code blocks are skipped by name, but a
+ * theme or an extension can render post text pre-wrap or pre-line — Recipes'
+ * card sits inside the post with a pre-line description — and there the break
+ * would be a visible empty line. So each landing spot's computed white-space
+ * is asked, not assumed. `whiteSpaceOf` is for the tests, which have no CSS.
+ */
+export function addQuoteBreaks(root: Element, scriptsHaveRun = false, whiteSpaceOf?: (el: Element) => string): void {
   const doc = root.ownerDocument;
   if (!doc) return;
+
+  const drawn = (el: Element | null): boolean => {
+    if (!el) return false;
+    try {
+      const ws = whiteSpaceOf ? whiteSpaceOf(el) : doc.defaultView?.getComputedStyle?.(el).whiteSpace;
+      return DRAWN.test(ws || '');
+    } catch (e) {
+      return false;
+    }
+  };
 
   /*
    * A code block's syntax highlighter comes as an inline <script> inside the
@@ -38,7 +59,7 @@ export function addQuoteBreaks(root: Element, scriptsHaveRun = false): void {
   }
 
   const end = (el: Element, ch: string) => {
-    if (el.closest('pre, code, .Scribe-videoCaption')) return;
+    if (el.closest('pre, code, .Scribe-videoCaption') || drawn(el)) return;
     const last = el.lastChild;
     if (last && last.nodeType === 3 && /[\n\t]$/.test(last.textContent || '')) return;
     // A list item, cell or row whose content already ends in a break; a second
@@ -58,14 +79,14 @@ export function addQuoteBreaks(root: Element, scriptsHaveRun = false): void {
   // A "\n" inside <pre> would be drawn, so the block after one starts with it.
   root.querySelectorAll('pre').forEach((pre) => {
     const next = pre.nextElementSibling;
-    if (!next || pre.parentElement?.closest('pre')) return;
+    if (!next || pre.parentElement?.closest('pre') || drawn(next)) return;
     const first = next.firstChild;
     if (first && first.nodeType === 3 && /^\n/.test(first.textContent || '')) return;
     next.insertBefore(doc.createTextNode('\n'), first);
   });
 
   root.querySelectorAll('br').forEach((br) => {
-    if (br.closest('pre, code')) return;
+    if (br.closest('pre, code') || drawn(br.parentElement)) return;
     const next = br.nextSibling;
     if (next && next.nodeType === 3 && /^\n/.test(next.textContent || '')) return;
     br.after(doc.createTextNode('\n'));

@@ -57,6 +57,15 @@ check('a post written with Markdown, which already has breaks between blocks, ge
   assert.equal(b.textContent, 'Line one\n\nWhat do you think this\n');
 });
 
+check('nothing lands where white-space is drawn (a pre-wrap or pre-line theme, Recipes\' description)', () => {
+  const b = body('<p>normal</p><div class="Recipe-description"><p>step one</p><p>line<br>two</p></div><p class="wrap">kept</p>');
+  const ws = (el) => (el.closest('.Recipe-description') ? 'pre-line' : el.classList.contains('wrap') ? 'pre-wrap' : 'normal');
+  addQuoteBreaks(b, false, ws);
+  assert.equal(b.querySelector('.Recipe-description').innerHTML, '<p>step one</p><p>line<br>two</p>');
+  assert.equal(b.querySelector('.wrap').innerHTML, 'kept');
+  assert.equal(b.querySelector('p').innerHTML, 'normal\n');
+});
+
 check('code keeps exactly its own line breaks', () => {
   const b = body('<pre><code>if (x) {\n  y();\n}</code></pre>');
   addQuoteBreaks(b);
